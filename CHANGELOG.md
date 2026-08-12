@@ -2,6 +2,8 @@
 
 ## [Unreleased] — 2026-08-12
 
+## [0.4.0] — 2026-08-12
+
 ### Added
 
 - Chrome Manifest V3 extension with a side panel, keyboard shortcut, and context menu.
@@ -11,6 +13,9 @@
 - Automated Native Host export tests.
 - Interface and Markdown export in English, Russian, French, Italian, and Chinese.
 - Compact bottom language switcher with locally persisted selection.
+- Optional visible-tab PNG references for each collected block.
+- Multiple saved projects and pages in one local workspace.
+- Double-click macOS installer and reproducible GitHub Release ZIP packaging.
 
 ### Fixed
 
@@ -22,6 +27,6 @@
 
 ### Changed
 
-- English is now the default locale and extension version is `0.3.0`.
+- English is now the default locale and extension version is `0.4.0`.
 - Typography uses the bundled Geologica variable Google Font under the SIL OFL, without network requests.
 - The service worker is named `collector-worker.js` to avoid stale worker error records during development.

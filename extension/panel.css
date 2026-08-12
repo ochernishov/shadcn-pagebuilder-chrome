@@ -43,7 +43,13 @@ label { display: grid; gap: calc(var(--space-1) * .5); color: var(--muted); font
 input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: calc(var(--radius) * .55); background: white; color: var(--ink); padding: var(--space-1); outline: none; }
 input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 .18rem rgba(255,92,53,.15); }
 textarea { resize: vertical; }
+.screenshot-option { display: flex; align-items: flex-start; gap: var(--space-1); padding: var(--space-2); border: 1px dashed var(--line); border-radius: calc(var(--radius) * .65); background: color-mix(in srgb, var(--card) 72%, var(--accent) 4%); cursor: pointer; }
+.screenshot-option input { flex: 0 0 auto; inline-size: 1.1rem; block-size: 1.1rem; margin-block-start: .1rem; accent-color: var(--accent); }
+.screenshot-option span, .screenshot-option strong, .screenshot-option small { display: block; }
+.screenshot-option strong { color: var(--ink); }
+.screenshot-option small { margin-block-start: calc(var(--space-1) * .25); color: var(--muted); font-weight: 500; }
 .grid { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-2); }
+.workspace-actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-1); }
 .registry { color: var(--accent-dark); font-family: ui-monospace, monospace; font-size: var(--text-small); overflow-wrap: anywhere; }
 .section-heading { justify-content: space-between; }
 .count { display: grid; place-items: center; min-inline-size: 2rem; aspect-ratio: 1; border-radius: 50%; background: var(--ink); color: white; }

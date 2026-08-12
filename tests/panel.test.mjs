@@ -15,3 +15,10 @@ test("discard clears pending state and hides capture immediately", () => {
   assert.match(body, /\$\("#capture"\)\.hidden = true/);
   assert.match(body, /chrome\.storage\.local\.remove\("pendingCapture"\)/);
 });
+
+test("workspace supports multiple saved specifications", () => {
+  const source = fs.readFileSync("extension/panel.js", "utf8");
+  assert.match(source, /function defaultWorkspace/);
+  assert.match(source, /workspace\.specs/);
+  assert.match(source, /async function createSpec/);
+});

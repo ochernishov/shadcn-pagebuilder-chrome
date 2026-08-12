@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
   "name": "__APP_NAME__",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "key": "__EXTENSION_PUBLIC_KEY__",
   "description": "Collect Shadcn Blocks into implementation-ready specifications for coding agents.",
-  "permissions": ["activeTab", "contextMenus", "storage", "sidePanel", "nativeMessaging", "commands"],
+  "permissions": ["activeTab", "contextMenus", "storage", "unlimitedStorage", "sidePanel", "nativeMessaging", "commands"],
   "host_permissions": ["__ALLOWED_HOST_PATTERN__"],
   "background": { "service_worker": "collector-worker.js", "type": "module" },
   "action": { "default_title": "Open __APP_NAME__" },

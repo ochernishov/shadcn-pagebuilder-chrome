@@ -15,6 +15,8 @@
     </header>
 
     <section id="settings" class="settings" hidden>
+      <label><span data-i18n="savedPages"></span><select id="saved-pages"></select></label>
+      <div class="workspace-actions"><button type="button" id="new-project" class="secondary" data-i18n="newProject"></button><button type="button" id="new-page" class="secondary" data-i18n="newPage"></button></div>
       <label><span data-i18n="project"></span><input id="project" autocomplete="off"></label>
       <label><span data-i18n="page"></span><input id="page" autocomplete="off"></label>
       <label><span data-i18n="targetRoute"></span><input id="route" autocomplete="off"></label>
@@ -29,6 +31,7 @@
         <label><span data-i18n="position"></span><input id="position" type="number" min="1"></label>
       </div>
       <label><span data-i18n="implementationNotes"></span><textarea id="instructions" rows="5" data-i18n-placeholder="notesPlaceholder"></textarea></label>
+      <label class="screenshot-option"><input id="include-screenshot" type="checkbox" checked><span><strong data-i18n="includeScreenshot"></strong><small data-i18n="screenshotHint"></small></span></label>
       <div class="actions"><button type="button" id="discard" class="secondary" data-i18n="discard"></button><button type="button" id="add" data-i18n="addBlock"></button></div>
     </section>
 

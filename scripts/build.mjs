@@ -12,7 +12,7 @@ function env() {
   return result;
 }
 const values = env();
-const required = ["APP_NAME", "NATIVE_HOST_NAME", "EXTENSION_PUBLIC_KEY", "ALLOWED_HOST_PATTERN", "DEFAULT_PROJECT", "DEFAULT_PAGE", "DEFAULT_ROUTE", "EXPORT_DIRECTORY"];
+const required = ["APP_NAME", "NATIVE_HOST_NAME", "EXTENSION_PUBLIC_KEY", "ALLOWED_HOST_PATTERN", "DEFAULT_PROJECT", "DEFAULT_PAGE", "DEFAULT_ROUTE", "EXPORT_DIRECTORY", "CHROME_EXTENSIONS_URL"];
 for (const key of required) if (!values[key]) throw new Error(`Missing ${key} in .env`);
 const dist = path.join(root, "dist", "extension");
 fs.rmSync(dist, { recursive: true, force: true });

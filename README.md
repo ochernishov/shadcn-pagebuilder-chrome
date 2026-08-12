@@ -20,6 +20,8 @@ Design selection and implementation are different jobs. This extension preserves
 - Capture a page, selection, or link from the Chrome context menu.
 - Automatically infer semantic section types such as Hero, Dashboard, Pricing, or FAQ.
 - Reorder and remove collected blocks.
+- Maintain multiple projects and pages in one local workspace.
+- Attach an optional PNG screenshot reference to every selected block.
 - Export `page-spec.json` and `PAGE_SPEC.md` through a local Native Messaging host.
 - Copy the generated coding-agent prompt directly to the clipboard.
 - Switch instantly between English, Russian, French, Italian, and Chinese.
@@ -61,6 +63,15 @@ The generated `PAGE_SPEC.md` beside `page-spec.json`, showing source metadata, a
 Planned file: `docs/screenshots/04-export.png`
 </details>
 
+## Install on macOS — release package
+
+1. Download `Shadcn-Page-Collector-v0.4.0.zip` from the latest GitHub Release.
+2. Unzip it and double-click **Install on macOS.command**.
+3. Chrome opens `chrome://extensions`; enable **Developer mode**.
+4. Click **Load unpacked** and select the `extension` folder inside the unzipped package.
+
+The installer copies the Native Messaging host into `~/Library/Application Support/Shadcn Page Collector/`. The downloaded package can be removed after Chrome has loaded the extension. Node.js 20+ is currently required by the local export host.
+
 ## Install from source
 
 Requirements:
@@ -89,16 +100,21 @@ The public extension key keeps the unpacked extension ID stable. It is not a sec
 1. Open a specific block detail page on Shadcn Blocks.
 2. Press the shortcut or click the extension icon.
 3. Choose the section type and add adaptation notes.
-4. Add the block and repeat for the rest of the page.
-5. Reorder the collected outline if needed.
-6. Click **Finish page** to export files, or **Copy prompt** to use the Markdown immediately.
+4. Leave **Include screenshot reference** enabled when a visual reference will help the target model.
+5. Add the block and repeat for the rest of the page.
+6. Create or switch projects/pages from the settings menu.
+7. Reorder the collected outline if needed.
+8. Click **Finish page** to export files, or **Copy prompt** to use the Markdown immediately.
 
 By default, exports are written to:
 
 ```text
 ~/Documents/Page Collector/<Project>/<Page>/
 ├── PAGE_SPEC.md
-└── page-spec.json
+├── page-spec.json
+└── references/
+    ├── 01-hero1.png
+    └── 02-feature12.png
 ```
 
 ## Languages
@@ -136,6 +152,7 @@ Copy `.env.example` to `.env`. Do not commit `.env`.
 npm run build
 npm run check
 npm run install:host
+npm run package
 ```
 
 Source files live in `extension/`. The `dist/extension/` directory is generated and must not be edited manually.

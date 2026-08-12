@@ -51,6 +51,12 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, respond) => {
+  if (message.type === "capture-screenshot") {
+    chrome.tabs.captureVisibleTab(undefined, { format: "png" })
+      .then(dataUrl => respond({ ok: true, dataUrl }))
+      .catch(error => respond({ ok: false, error: error.message }));
+    return true;
+  }
   if (message.type === "set-locale") {
     createContextMenu(message.locale);
     respond({ ok: true });

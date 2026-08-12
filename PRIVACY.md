@@ -4,12 +4,14 @@ Shadcn Page Collector is local-first.
 
 ## Data collected
 
-The extension stores the project name, page name, target route, selected language, captured block metadata, ordering, and notes that you enter.
+The extension stores project names, page names, target routes, selected language, captured block metadata, ordering, notes that you enter, and optional screenshots that you explicitly enable.
 
 ## Where data is stored
 
 - Working state: `chrome.storage.local` in your browser profile.
 - Finished exports: the directory configured by `EXPORT_DIRECTORY` through the local Native Messaging host.
+
+Screenshots capture the visible content area of the active tab when you click **Add block** with the screenshot option enabled. They remain local and are exported as PNG references.
 
 ## Network activity
 
