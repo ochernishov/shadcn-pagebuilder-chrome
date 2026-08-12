@@ -1,10 +1,10 @@
-# Архитектура Page Collector
+# Shadcn Page Collector architecture
 
-## Поток данных
+## Data flow
 
 ```text
 Shadcn Blocks page
-  -> Chrome command / context menu
+  -> Chrome action / context menu
   -> background service worker
   -> side panel + chrome.storage.local
   -> Native Messaging
@@ -13,31 +13,33 @@ Shadcn Blocks page
   -> Codex / Claude Code
 ```
 
-## Границы компонентов
+## Component boundaries
 
 ### Chrome extension
 
-Получает только URL, заголовок, slug, выделенный текст и вычисляемую registry-команду. Хоткей и клик по значку вызывают встроенное действие Chrome `_execute_action`, которое безопасно открывает side panel; после открытия панель запрашивает метаданные активной вкладки. Контекстное меню сохраняет pending-блок и показывает badge, но не вызывает нестабильный `sidePanel.open()`. Управляет проектом и порядком блоков. Исходный код платных блоков не извлекает и не хранит.
+The extension records only the URL, title, slug, selected text, and derived registry command. The shortcut and toolbar icon use Chrome's built-in `_execute_action`, which opens the side panel safely. The panel then requests metadata for the active tab. The context menu stores a pending block and displays a badge without calling `sidePanel.open()`.
 
-### Native Host
+The extension manages project metadata, semantic block types, and ordering. It does not extract or store paid block source code.
 
-Принимает единственное действие `export`, безопасно нормализует имена каталогов и записывает JSON/Markdown с правами владельца. Корневая директория поступает из окружения launcher-скрипта.
+### Native Messaging host
 
-### Конфигурация сборки
+The host accepts one `export` action, normalizes directory names, and writes JSON and Markdown with owner-only permissions. The launcher provides the root export directory through its environment.
 
-`scripts/build.mjs` читает `.env`, заменяет токены в шаблонах, копирует статические файлы и создаёт self-contained Chrome bundle в `dist/extension`.
+### Build configuration
 
-## Формат спецификации
+`scripts/build.mjs` reads `.env`, replaces template tokens, copies static files, and creates a self-contained Chrome bundle in `dist/extension`.
 
-JSON остаётся источником истины и допускает будущие экспортеры. Markdown — производное представление для coding agent. Каждый блок содержит source URL, slug, registry ID, CLI command, семантический тип и инструкции пользователя.
+## Specification format
 
-## Локализация
+JSON is the source of truth and supports future exporters. Markdown is a derived representation for a coding agent. Each block contains its source URL, slug, registry ID, CLI command, semantic type key, and user instructions.
 
-`extension/i18n.js` является единым источником строк для EN, RU, FR, IT и ZH. Английский используется по умолчанию. В данных блока сохраняется стабильный `typeKey`, поэтому смена языка переводит существующий список и экспорт без изменения структуры JSON.
+## Localization
 
-## Следующие версии
+`extension/i18n.js` is the single source of interface and export strings for EN, RU, FR, IT, and ZH. English is the default. Block data stores a stable `typeKey`, so changing language translates an existing outline and export without changing the JSON structure.
 
-- Скриншот выбранной секции как визуальный reference.
-- Несколько сохранённых страниц и проектов.
-- Drag-and-drop порядка блоков.
-- Явная интеграция с Shadcn MCP и запуск coding agent.
+## Potential next versions
+
+- Screenshot references for selected sections.
+- Multiple saved projects and pages.
+- Drag-and-drop block ordering.
+- Explicit Shadcn MCP integration and coding-agent launch.

@@ -1,22 +1,22 @@
-# Project Instructions
+# Project instructions
 
 ## Scope
 
-Page Collector состоит из Chrome Manifest V3 extension и локального Node.js Native Messaging Host.
+Shadcn Page Collector consists of a Chrome Manifest V3 extension and a local Node.js Native Messaging host.
 
 ## Commands
 
 - Build: `npm run build`
 - Tests: `npm run check`
-- Native Host: `npm run install:host` (ID вычисляется из `EXTENSION_PUBLIC_KEY`)
+- Native Host: `npm run install:host` (the ID is derived from `EXTENSION_PUBLIC_KEY`)
 
 ## Conventions
 
-- Не добавлять исходники или credentials платной библиотеки Shadcn Blocks.
-- Настраиваемые имена, host patterns и export paths брать только из `.env`.
-- `extension/` является исходником; `dist/extension/` генерируется и не редактируется вручную.
-- Сохранять совместимость с Chrome Manifest V3 и не добавлять remote code.
-- После значимых изменений обновлять `README.md`, `CHANGELOG.md` и `docs/ARCHITECTURE.md`.
-- Все пользовательские строки хранить в `extension/i18n.js`; английский — язык по умолчанию.
-- Стабильные данные блока хранят `typeKey`, а не локализованный label.
-- Публичный репозиторий не должен содержать `.env`, `dist/`, платный исходный код блоков или шрифты без разрешающей лицензии.
+- Never add paid Shadcn Blocks source code or credentials.
+- Read configurable names, host patterns, and export paths from `.env`.
+- `extension/` is the source; `dist/extension/` is generated and must not be edited manually.
+- Preserve Chrome Manifest V3 compatibility and never add remote code.
+- Update `README.md`, `CHANGELOG.md`, and `docs/ARCHITECTURE.md` after meaningful behavior changes.
+- Keep all user-facing strings in `extension/i18n.js`; English is the default locale.
+- Store stable `typeKey` values instead of localized labels in block data.
+- Never commit `.env`, `dist/`, paid block source, or fonts without a permissive redistribution license.

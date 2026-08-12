@@ -4,25 +4,24 @@
 
 ### Added
 
-- Chrome Manifest V3 extension с side panel, хоткеем и контекстным меню.
-- Структурированный сбор блоков и генерация agent-ready Markdown.
-- Локальный Native Messaging Host для атомарного экспорта JSON и Markdown.
-- Env-driven сборка и стабильный Chrome extension ID.
-- Автоматический тест экспорта Native Host.
-- Интерфейс и Markdown-экспорт на английском, русском, французском, итальянском и китайском языках.
-- Компактный переключатель языка в нижней части боковой панели; выбранный язык сохраняется локально.
+- Chrome Manifest V3 extension with a side panel, keyboard shortcut, and context menu.
+- Structured block collection and coding-agent-ready Markdown generation.
+- Local Native Messaging host for atomic JSON and Markdown exports.
+- Environment-driven builds and a stable Chrome extension ID.
+- Automated Native Host export tests.
+- Interface and Markdown export in English, Russian, French, Italian, and Chinese.
+- Compact bottom language switcher with locally persisted selection.
 
 ### Fixed
 
-- Заменён неподдерживаемый Chrome shortcut `Alt+Command+B` на валидный macOS shortcut `Command+Shift+K`.
-- Семантический тип нового блока теперь определяется по slug и заголовку вместо постоянного значения `Hero`.
-- Кнопка отказа от нового блока немедленно закрывает карточку и очищает `pendingCapture`, включая синхронизацию между панелями.
-- CSS-правило `[hidden]` теперь гарантированно скрывает карточку нового блока и настройки; ранее `display: grid` переопределял браузерный стиль атрибута.
-- `sidePanel.open()` полностью удалён из runtime-кода из-за различий Chrome в трактовке user gesture. Хоткей и значок используют штатный `_execute_action`; контекстное меню сохраняет блок и показывает badge на значке.
+- Replaced unsupported `Alt+Command+B` with the valid macOS shortcut `Command+Shift+K`.
+- New blocks infer a semantic type from their slug and title instead of defaulting to Hero.
+- Discard immediately closes the pending block card and clears `pendingCapture` across panels.
+- `[hidden]` now reliably hides the capture card and settings instead of being overridden by `display: grid`.
+- Removed `sidePanel.open()` from runtime code. The shortcut and toolbar icon use Chrome's `_execute_action`; context-menu capture signals pending work with a badge.
 
 ### Changed
 
-- Интерфейс и генерируемая спецификация полностью локализованы на русский язык.
-- Типографика переведена на встроенный Google Font Geologica Variable с открытой OFL-лицензией и без сетевых запросов.
-- Версия расширения поднята до `0.2.1`, service worker переименован в `collector-worker.js`, чтобы Chrome не связывал новую сборку с сохранёнными ошибками старого worker.
-- Английский стал языком по умолчанию; версия расширения поднята до `0.3.0`.
+- English is now the default locale and extension version is `0.3.0`.
+- Typography uses the bundled Geologica variable Google Font under the SIL OFL, without network requests.
+- The service worker is named `collector-worker.js` to avoid stale worker error records during development.
