@@ -2,7 +2,8 @@ import { DEFAULT_LOCALE, LOCALES, MESSAGES, localizeSystemLabels, migrateSystemL
 
 const TYPE_KEYS = ["hero", "navigation", "dashboard", "applicationShell", "dataTable", "logos", "features", "content", "steps", "cta", "pricing", "testimonials", "faq", "footer", "other"];
 const $ = selector => document.querySelector(selector);
-const state = { spec: null, pending: null, locale: DEFAULT_LOCALE, workspace: null, expandedBlockId: null, screenshots: {} };
+const state = { spec: null, pending: null, locale: DEFAULT_LOCALE, workspace: null, expandedBlockId: null, screenshots: {}, settingsExpanded: true };
+let folderPickerOpen = false;
 const t = key => translate(state.locale, key);
 const safeFileName = value => String(value || "block").normalize("NFKD").replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || "block";
 
@@ -69,7 +70,7 @@ async function setLocale(locale) {
 }
 
 async function hydrate() {
-  const stored = await chrome.storage.local.get(["pageSpec", "workspace", "pendingCapture", "locale", "screenshots"]);
+  const stored = await chrome.storage.local.get(["pageSpec", "workspace", "pendingCapture", "locale", "screenshots", "settingsExpanded"]);
   state.locale = MESSAGES[stored.locale] ? stored.locale : DEFAULT_LOCALE;
   const legacySpec = stored.pageSpec || defaultSpec();
   if (!legacySpec.id) legacySpec.id = crypto.randomUUID();
@@ -82,6 +83,7 @@ async function hydrate() {
     migrateSystemLabels(spec, state.locale, { project: APP_CONFIG.defaultProject, page: APP_CONFIG.defaultPage });
   });
   state.spec = state.workspace.specs.find(spec => spec.id === state.workspace.activeSpecId) || state.workspace.specs[0];
+  state.settingsExpanded = typeof stored.settingsExpanded === "boolean" ? stored.settingsExpanded : !state.spec.projectDirectory;
   state.screenshots = stored.screenshots || {};
   state.pending = stored.pendingCapture || null;
   const existing = state.pending && state.spec.blocks.find(block => block.kind !== "visual-reference" && block.url === state.pending.url);
@@ -94,10 +96,6 @@ async function hydrate() {
   if (existing) status(t("alreadyAdded"));
   await chrome.runtime.sendMessage({ type: "panel-ready" });
   await chrome.runtime.sendMessage({ type: "set-locale", locale: state.locale });
-  if (!state.pending) {
-    const response = await chrome.runtime.sendMessage({ type: "capture-active" });
-    if (!response?.ok) status(`${t("captureFailed")}: ${response?.error || t("unknownError")}`);
-  }
 }
 
 function markdown(spec) {
@@ -143,6 +141,23 @@ function renderPageMode() {
   })));
 }
 
+function renderSettings() {
+  const expanded = state.settingsExpanded;
+  const mode = t(state.spec.pageMode === "edit" ? "editPage" : "createPage");
+  $("#settings").setAttribute("aria-expanded", String(expanded));
+  $("#settings-toggle").setAttribute("aria-expanded", String(expanded));
+  $("#settings-toggle").setAttribute("aria-label", t(expanded ? "collapseProjectSettings" : "expandProjectSettings"));
+  $("#settings-fields").hidden = !expanded;
+  $("#settings-summary-title").textContent = `${state.spec.project} / ${state.spec.page}`;
+  $("#settings-summary-meta").textContent = `${state.spec.route} · ${mode}`;
+}
+
+async function setSettingsExpanded(expanded) {
+  state.settingsExpanded = expanded;
+  await chrome.storage.local.set({ settingsExpanded: expanded });
+  renderSettings();
+}
+
 async function createSpec(project, page, labelKeys = {}) {
   const spec = { ...defaultSpec(), project, page };
   if (labelKeys.projectLabelKey) spec.projectLabelKey = labelKeys.projectLabelKey;
@@ -155,10 +170,19 @@ async function createSpec(project, page, labelKeys = {}) {
 }
 
 async function requestProjectFolder() {
-  const response = await chrome.runtime.sendMessage({ type: "native", payload: { action: "choose-directory", prompt: t("projectFolder") } });
-  if (response?.ok) return response;
-  if (!response?.canceled) status(`${t("chooseFolderFailed")}: ${response?.error || t("unknownError")}`);
-  return null;
+  if (folderPickerOpen) return null;
+  folderPickerOpen = true;
+  const buttons = [$("#choose-folder"), $("#new-project")];
+  buttons.forEach(button => { button.disabled = true; });
+  try {
+    const response = await chrome.runtime.sendMessage({ type: "native", payload: { action: "choose-directory", prompt: t("projectFolder") } });
+    if (response?.ok) return response;
+    if (!response?.canceled && !response?.busy) status(`${t("chooseFolderFailed")}: ${response?.error || t("unknownError")}`);
+    return null;
+  } finally {
+    folderPickerOpen = false;
+    buttons.forEach(button => { button.disabled = false; });
+  }
 }
 
 async function chooseFolderForCurrentSpec() {
@@ -167,6 +191,8 @@ async function chooseFolderForCurrentSpec() {
   state.spec.projectDirectory = selected.directory;
   state.spec.project = selected.name;
   delete state.spec.projectLabelKey;
+  state.settingsExpanded = false;
+  await chrome.storage.local.set({ settingsExpanded: false });
   await persist();
 }
 
@@ -175,12 +201,12 @@ function render() {
   renderLanguageSwitcher();
   renderWorkspace();
   renderPageMode();
+  renderSettings();
   $("#project-folder").textContent = state.spec.projectDirectory || t("noFolder");
   $("#project-folder").title = state.spec.projectDirectory || t("noFolder");
   $("#page").value = state.spec.page;
   $("#route").value = state.spec.route;
   $("#page-title").textContent = state.spec.page;
-  $("#count").textContent = state.spec.blocks.length;
   $("#empty").hidden = state.spec.blocks.length > 0;
   $("#blocks").replaceChildren(...state.spec.blocks.map((block, index) => {
     const li = document.createElement("li");
@@ -275,8 +301,9 @@ async function cropScreenshot(dataUrl, rect, viewport) {
 async function addVisualReference() {
   const button = $("#add-screenshot");
   button.disabled = true;
-  status(t("selectRegionStatus"));
   try {
+    await requestCapturePermission();
+    status(t("selectRegionStatus"));
     const response = await chrome.runtime.sendMessage({
       type: "capture-selected-region",
       labels: { hint: t("regionSelectionHint"), cancel: t("regionSelectionCancel"), noActivePage: t("noActiveWebPage") }
@@ -315,6 +342,11 @@ async function addVisualReference() {
 }
 function status(text) { $("#status").textContent = text; setTimeout(() => $("#status").textContent = "", 3500); }
 
+async function requestCapturePermission() {
+  const granted = await chrome.permissions.request({ origins: [APP_CONFIG.allowedHostPattern] });
+  if (!granted) throw new Error(t("siteAccessRequired"));
+}
+
 async function discardPending() {
   const button = $("#discard");
   button.disabled = true;
@@ -332,7 +364,21 @@ async function discardPending() {
   }
 }
 
-$("#settings-toggle").onclick = () => $("#settings").hidden = !$("#settings").hidden;
+$("#settings-toggle").onclick = () => setSettingsExpanded(!state.settingsExpanded);
+$("#add-current-page").onclick = async () => {
+  const button = $("#add-current-page");
+  button.disabled = true;
+  try {
+    await requestCapturePermission();
+    const response = await chrome.runtime.sendMessage({ type: "capture-active" });
+    if (!response?.ok) throw new Error(response?.error || t("unknownError"));
+    status(t("currentPageCaptured"));
+  } catch (error) {
+    status(`${t("captureFailed")}: ${error.message}`);
+  } finally {
+    button.disabled = false;
+  }
+};
 $("#add-screenshot").onclick = addVisualReference;
 $("#copy-collection-id").onclick = async () => {
   await navigator.clipboard.writeText($("#collection-id").textContent);
@@ -354,6 +400,8 @@ $("#new-project").onclick = async () => {
   const usesDefaultPage = page.trim() === t("defaultPageName");
   await createSpec(selected.name, page.trim(), usesDefaultPage ? { pageLabelKey: "defaultPageName" } : {});
   state.spec.projectDirectory = selected.directory;
+  state.settingsExpanded = false;
+  await chrome.storage.local.set({ settingsExpanded: false });
   await persist();
 };
 $("#new-page").onclick = async () => {
@@ -423,6 +471,7 @@ chrome.storage.onChanged.addListener(async (changes, area) => {
     } else {
       state.pending = pending;
     }
+    await chrome.runtime.sendMessage({ type: "panel-ready" });
     render();
   }
 });

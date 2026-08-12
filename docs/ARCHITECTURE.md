@@ -18,11 +18,13 @@ Any HTTP/HTTPS source page
 
 ### Chrome extension
 
-The extension records only factual source metadata: URL, title, hostname, slug, selected text, capture time, and user instructions. It does not classify subscriptions or invent an installation command. The shortcut and toolbar icon use Chrome's built-in `_execute_action`, which opens the side panel safely. The panel then requests metadata for the active tab. The context menu stores a pending source and displays a badge without calling `sidePanel.open()`.
+The extension records only factual source metadata: URL, title, hostname, slug, selected text, capture time, and user instructions. It does not classify subscriptions or invent an installation command. The toolbar icon uses Chrome's action behavior to open the side panel. The `capture-block` keyboard command records the active page without opening or closing the panel; an already open panel receives the pending capture through storage changes, while a closed panel is signaled with a badge. The context menu follows the same pending-capture path. Runtime code never calls `sidePanel.open()`.
 
 The extension manages multiple projects/pages, selected local project directories, Create/Edit intent, routes, semantic section types, ordering, expandable source metadata, and screenshots stored separately from the JSON specification. A pending source whose URL already exists is deduplicated and opens the saved entry.
 
-Manual region capture uses the temporary `activeTab` grant and the `scripting` permission. After the explicit **+ Screenshot** click, the service worker injects an isolated Shadow DOM selection overlay into the active page. The user drags a rectangle; the overlay is removed before `captureVisibleTab` runs. The side panel crops the PNG using the captured viewport-to-image scale, adds a `visual-reference` item, and clears the automatically detected pending source. No persistent all-sites host permission is requested.
+Keyboard and context-menu captures use the temporary `activeTab` grant. A side-panel click does not provide that grant, so **Add current page** and **Add screenshot** synchronously request the configured HTTP/HTTPS pattern from `optional_host_permissions`. Chrome prompts only after the explicit click, retains an accepted permission, and lets the user revoke it later.
+
+Manual region capture also uses the `scripting` permission. After the explicit **Add screenshot** click and permission grant, the service worker injects an isolated Shadow DOM selection overlay into the active page. The user drags a rectangle; the overlay is removed before `captureVisibleTab` runs. The side panel crops the PNG using the captured viewport-to-image scale, adds a `visual-reference` item, and clears the automatically detected pending source.
 
 Source access is intentionally deferred. The exported agent instructions require the implementation agent to inspect its own authorized registries and credentials. When official source access is unavailable, the agent must create an original implementation from the visible reference without bypassing access controls or copying proprietary code.
 

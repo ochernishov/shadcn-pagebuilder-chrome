@@ -2,6 +2,23 @@
 
 ## [Unreleased] — 2026-08-12
 
+## [0.8.1] — 2026-08-12
+
+### Fixed
+
+- Restored `Command+Shift+K` as a dedicated active-page capture command instead of Chrome's `_execute_action`, so the shortcut no longer opens or closes the side panel.
+- An already open panel now clears the capture badge as soon as it receives the shortcut capture.
+- Side-panel page and screenshot buttons now request optional website access after the user's click instead of failing with `No active web page`.
+- Project folder selection now allows only one native macOS picker at a time, preventing repeated clicks from queuing duplicate dialogs.
+- Long project paths and translated controls no longer widen the Chrome side panel or push settings content off-screen.
+
+### Changed
+
+- Project settings now collapse into a persistent one-line summary showing project, page, route, and Create/Edit intent; choosing a project folder collapses the settings automatically.
+- The page workspace now shows the page name followed by explicit **Add current page** and **Add screenshot** actions; the redundant `CURRENT PAGE` label and circular item counter were removed.
+- Opening the side panel no longer captures the active tab automatically. Capture happens only through the dedicated button, keyboard command, or context menu.
+- Installation and update instructions now require verifying the capture command in `chrome://extensions/shortcuts` and document the **Add current page** fallback.
+
 ## [0.8.0] — 2026-08-12
 
 ### Added

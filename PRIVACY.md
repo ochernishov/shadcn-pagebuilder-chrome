@@ -13,7 +13,11 @@ The extension stores selected local project paths, project names, page names, Cr
 
 The Native Host creates `Collector/.gitignore` with a deny-by-default rule. Generated packages, URLs, notes, local paths, and screenshots therefore stay out of the target project's Git history unless the user deliberately changes that file.
 
-Screenshots capture either the visible content area when you click **Add block** with the screenshot option enabled, or the page rectangle you explicitly select after clicking **+ Screenshot**. They remain local and are exported as PNG references.
+Screenshots capture either the visible content area when you click **Add block** with the screenshot option enabled, or the page rectangle you explicitly select after clicking **Add screenshot**. They remain local and are exported as PNG references.
+
+## Website access
+
+The extension does not require permanent website access at installation. The configured HTTP/HTTPS pattern is an optional permission that Chrome requests only when you explicitly click **Add current page** or **Add screenshot** in the side panel. If you decline, no page is captured. Chrome retains an accepted permission until you revoke it in the extension settings. The keyboard shortcut and context menu use Chrome's temporary `activeTab` access.
 
 ## Network activity
 
