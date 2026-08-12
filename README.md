@@ -65,7 +65,7 @@ Planned file: `docs/screenshots/04-export.png`
 
 ## Install on macOS — release package
 
-1. Download `Shadcn-Page-Collector-v0.4.0.zip` from the latest GitHub Release.
+1. Download `Shadcn-Page-Collector-v0.4.1.zip` from the latest GitHub Release.
 2. Unzip it and double-click **Install on macOS.command**.
 3. Chrome opens `chrome://extensions`; enable **Developer mode**.
 4. Click **Load unpacked** and select the `extension` folder inside the unzipped package.
@@ -145,6 +145,8 @@ Copy `.env.example` to `.env`. Do not commit `.env`.
 | `DEFAULT_PROJECT` | Initial project name |
 | `DEFAULT_PAGE` | Initial page name |
 | `DEFAULT_ROUTE` | Initial route |
+| `CHROME_EXTENSIONS_URL` | Browser extension-management page opened by the installer |
+| `CHROME_APP_NAME` | macOS browser application name used by the installer |
 
 ## Development
 

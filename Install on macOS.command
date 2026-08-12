@@ -17,7 +17,8 @@ fi
 node scripts/install-host.mjs
 
 CHROME_EXTENSIONS_URL="$(sed -n 's/^CHROME_EXTENSIONS_URL=//p' .env | head -n 1)"
-open -a "Google Chrome" "$CHROME_EXTENSIONS_URL"
+CHROME_APP_NAME="$(sed -n 's/^CHROME_APP_NAME=//p' .env | head -n 1)"
+open -a "$CHROME_APP_NAME" "$CHROME_EXTENSIONS_URL"
 
 echo
 echo "Native host installed successfully."

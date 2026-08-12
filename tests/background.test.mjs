@@ -20,3 +20,9 @@ test("context menu records a pending block and signals it with a badge", () => {
   assert.match(menuBody, /capture\(tab, info\.selectionText \|\| ""\)/);
   assert.match(menuBody, /chrome\.action\.setBadgeText/);
 });
+
+test("screenshot requests use the visible-tab PNG API", () => {
+  const source = fs.readFileSync("extension/collector-worker.js", "utf8");
+  assert.match(source, /message\.type === "capture-screenshot"/);
+  assert.match(source, /chrome\.tabs\.captureVisibleTab\(undefined, \{ format: "png" \}\)/);
+});

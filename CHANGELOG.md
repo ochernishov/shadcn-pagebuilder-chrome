@@ -2,6 +2,12 @@
 
 ## [Unreleased] — 2026-08-12
 
+## [0.4.1] — 2026-08-12
+
+### Fixed
+
+- The macOS installer reads the browser application name from `.env` instead of hardcoding Google Chrome.
+
 ## [0.4.0] — 2026-08-12
 
 ### Added
