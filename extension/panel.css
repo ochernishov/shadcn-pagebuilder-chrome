@@ -50,16 +50,29 @@ textarea { resize: vertical; }
 .screenshot-option small { margin-block-start: calc(var(--space-1) * .25); color: var(--muted); font-weight: 500; }
 .grid { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-2); }
 .workspace-actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-1); }
+.folder-picker { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2); border: 1px solid var(--line); border-radius: calc(var(--radius) * .65); background: white; }
+.folder-picker div { min-width: 0; flex: 1; }
+.folder-picker span, .folder-picker strong { display: block; }
+.folder-picker span { color: var(--muted); font-size: var(--text-small); font-weight: 700; }
+.folder-picker strong { margin-block-start: calc(var(--space-1) * .2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.folder-picker button { flex: 0 0 auto; }
 .registry { color: var(--accent-dark); font-family: ui-monospace, monospace; font-size: var(--text-small); overflow-wrap: anywhere; }
 .section-heading { justify-content: space-between; }
 .count { display: grid; place-items: center; min-inline-size: 2rem; aspect-ratio: 1; border-radius: 50%; background: var(--ink); color: white; }
 .blocks { display: grid; gap: var(--space-1); padding: 0; list-style: none; }
-.block { gap: var(--space-2); padding: var(--space-2); border-block-end: 1px solid var(--line); }
+.block { display: block; padding: 0; border-block-end: 1px solid var(--line); }
+.block-summary { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2); cursor: pointer; }
+.block-details { display: grid; gap: var(--space-1); padding: 0 var(--space-2) var(--space-2) calc(var(--space-2) + 2rem); color: var(--muted); font-size: var(--text-small); }
+.block-details a { color: var(--accent-dark); font-weight: 700; overflow-wrap: anywhere; }
+.block-details code { padding: calc(var(--space-1) * .35); border-radius: calc(var(--radius) * .35); background: var(--card); color: var(--ink); overflow-wrap: anywhere; }
+.block-details p { white-space: pre-wrap; }
 .block-order { color: var(--accent-dark); font: 700 var(--text-body)/1 "Geologica", sans-serif; }
 .block-copy { min-width: 0; flex: 1; }
 .block-copy strong, .block-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .block-copy small { color: var(--muted); }
 .block button { padding: .2rem .45rem; background: transparent; color: var(--muted); }
+.block-toggle { transition: transform 150ms ease; }
+.block[aria-expanded="true"] .block-toggle { transform: rotate(180deg); }
 .empty { margin-block: clamp(2rem, 10vh, 5rem); text-align: center; color: var(--muted); }
 .empty span { display: inline-block; padding: var(--space-1) var(--space-2); border: 1px solid var(--line); border-radius: .5rem; background: var(--card); color: var(--ink); box-shadow: 0 .2rem 0 var(--line); }
 footer { margin-top: auto; }

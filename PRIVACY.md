@@ -4,7 +4,7 @@ Shadcn Page Collector is local-first.
 
 ## Data collected
 
-The extension stores project names, page names, target routes, selected language, captured block metadata, ordering, notes that you enter, and optional screenshots that you explicitly enable.
+The extension stores selected local project paths, project names, page names, Create/Edit mode, target routes, selected language, captured block metadata, ordering, notes that you enter, and optional screenshots that you explicitly enable.
 
 ## Where data is stored
 

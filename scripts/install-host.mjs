@@ -17,6 +17,6 @@ fs.mkdirSync(hostDir, { recursive: true }); fs.mkdirSync(runtimeDir, { recursive
 const installedHost = path.join(runtimeDir, "host.mjs");
 fs.copyFileSync(path.join(root, "native-host", "host.mjs"), installedHost);
 const launcher = path.join(runtimeDir, "native-host.sh");
-fs.writeFileSync(launcher, `#!/bin/sh\nexport PAGE_COLLECTOR_EXPORT_DIRECTORY=${JSON.stringify(env.EXPORT_DIRECTORY)}\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(installedHost)}\n`, { mode: 0o700 });
+fs.writeFileSync(launcher, `#!/bin/sh\nexport PAGE_COLLECTOR_EXPORT_DIRECTORY=${JSON.stringify(env.EXPORT_DIRECTORY)}\nexport PAGE_COLLECTOR_PROJECT_EXPORT_DIRECTORY=${JSON.stringify(env.PROJECT_EXPORT_DIRECTORY)}\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(installedHost)}\n`, { mode: 0o700 });
 fs.writeFileSync(path.join(hostDir, `${env.NATIVE_HOST_NAME}.json`), JSON.stringify({ name: env.NATIVE_HOST_NAME, description: `${env.APP_NAME} local export host`, path: launcher, type: "stdio", allowed_origins: [`chrome-extension://${extensionId}/`] }, null, 2) + "\n");
 console.log(`Installed native host for ${extensionId}`);

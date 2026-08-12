@@ -21,7 +21,11 @@ Design selection and implementation are different jobs. This extension preserves
 - Automatically infer semantic section types such as Hero, Dashboard, Pricing, or FAQ.
 - Reorder and remove collected blocks.
 - Maintain multiple projects and pages in one local workspace.
+- Choose the real local project folder through the native macOS folder picker.
+- Mark each page task as Create or Edit and preserve its target route.
 - Attach an optional PNG screenshot reference to every selected block.
+- Expand every collected block to revisit its source URL, registry command, notes, and screenshot status.
+- Detect an already collected source URL and open its saved entry instead of presenting it as new.
 - Export `page-spec.json` and `PAGE_SPEC.md` through a local Native Messaging host.
 - Copy the generated coding-agent prompt directly to the clipboard.
 - Switch instantly between English, Russian, French, Italian, and Chinese.
@@ -65,7 +69,7 @@ Planned file: `docs/screenshots/04-export.png`
 
 ## Install on macOS — release package
 
-1. Download `Shadcn-Page-Collector-v0.4.1.zip` from the latest GitHub Release.
+1. Download `Shadcn-Page-Collector-v0.5.0.zip` from the latest GitHub Release.
 2. Unzip it and double-click **Install on macOS.command**.
 3. Chrome opens `chrome://extensions`; enable **Developer mode**.
 4. Click **Load unpacked** and select the `extension` folder inside the unzipped package.
@@ -102,11 +106,19 @@ The public extension key keeps the unpacked extension ID stable. It is not a sec
 3. Choose the section type and add adaptation notes.
 4. Leave **Include screenshot reference** enabled when a visual reference will help the target model.
 5. Add the block and repeat for the rest of the page.
-6. Create or switch projects/pages from the settings menu.
-7. Reorder the collected outline if needed.
-8. Click **Finish page** to export files, or **Copy prompt** to use the Markdown immediately.
+6. Choose the local project folder, set the page name, route, and Create/Edit task.
+7. Create or switch projects/pages from the always-visible project section.
+8. Expand saved blocks whenever you need to revisit their original source.
+9. Reorder the collected outline if needed.
+10. Click **Finish page** to export files, or **Copy prompt** to use the Markdown immediately.
 
-By default, exports are written to:
+When a project folder is selected, exports are written to:
+
+```text
+<Project>/.page-collector/<Page>/
+```
+
+Without a selected project folder, the fallback location is:
 
 ```text
 ~/Documents/Page Collector/<Project>/<Page>/
@@ -147,6 +159,7 @@ Copy `.env.example` to `.env`. Do not commit `.env`.
 | `DEFAULT_ROUTE` | Initial route |
 | `CHROME_EXTENSIONS_URL` | Browser extension-management page opened by the installer |
 | `CHROME_APP_NAME` | macOS browser application name used by the installer |
+| `PROJECT_EXPORT_DIRECTORY` | Subdirectory created inside a selected project folder |
 
 ## Development
 

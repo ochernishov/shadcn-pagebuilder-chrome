@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__APP_NAME__",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "key": "__EXTENSION_PUBLIC_KEY__",
   "description": "Collect Shadcn Blocks into implementation-ready specifications for coding agents.",
   "permissions": ["activeTab", "contextMenus", "storage", "unlimitedStorage", "sidePanel", "nativeMessaging", "commands"],

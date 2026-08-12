@@ -19,11 +19,11 @@ Shadcn Blocks page
 
 The extension records only the URL, title, slug, selected text, and derived registry command. The shortcut and toolbar icon use Chrome's built-in `_execute_action`, which opens the side panel safely. The panel then requests metadata for the active tab. The context menu stores a pending block and displays a badge without calling `sidePanel.open()`.
 
-The extension manages multiple projects/pages, semantic block types, ordering, and optional screenshot references. Screenshots are stored separately from the JSON specification and are only captured after an explicit checked option and user click. It does not extract or store paid block source code.
+The extension manages multiple projects/pages, selected local project directories, Create/Edit intent, routes, semantic block types, ordering, expandable source metadata, and optional screenshot references. Screenshots are stored separately from the JSON specification and are only captured after an explicit checked option and user click. A pending capture whose URL already exists is deduplicated and opens the saved entry. It does not extract or store paid block source code.
 
 ### Native Messaging host
 
-The host accepts one `export` action, normalizes directory names, and writes JSON, Markdown, and optional PNG references with owner-only permissions. The launcher provides the root export directory through its environment. Installation copies the host into Application Support so it does not depend on the downloaded repository or release directory.
+The host accepts `choose-directory` and `export` actions. On macOS, `choose-directory` opens the native folder picker. Export normalizes directory names and writes JSON, Markdown, and optional PNG references with owner-only permissions into `<project>/.page-collector/<page>/`. The launcher provides the fallback root and project subdirectory through its environment. Installation copies the host into Application Support so it does not depend on the downloaded repository or release directory.
 
 ### Build configuration
 

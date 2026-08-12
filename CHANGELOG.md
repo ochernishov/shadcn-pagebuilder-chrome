@@ -2,6 +2,18 @@
 
 ## [Unreleased] — 2026-08-12
 
+## [0.5.0] — 2026-08-12
+
+### Added
+
+- Always-visible project context with native macOS folder selection.
+- Create/Edit page intent and target route in the stored and exported specification.
+- Expandable saved blocks with source link, registry metadata, install command, notes, and screenshot status.
+
+### Fixed
+
+- Capturing an already saved source URL now expands the existing entry instead of showing another New Block card.
+
 ## [0.4.1] — 2026-08-12
 
 ### Fixed

@@ -28,3 +28,13 @@ test("native host exports screenshot references as PNG files", () => {
   assert.equal(result.status, 0);
   assert.ok(fs.statSync(path.join(directory, "Test", "Visual", "references", "01-hero1.png")).size > 0);
 });
+
+test("native host exports into the selected project directory", () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "page-collector-project-"));
+  const spec = { project: "Ignored", projectDirectory: directory, page: "Settings", blocks: [] };
+  const message = Buffer.from(JSON.stringify({ action: "export", spec, markdown: "# Settings\n" }));
+  const length = Buffer.alloc(4); length.writeUInt32LE(message.length);
+  const result = spawnSync(process.execPath, ["native-host/host.mjs"], { input: Buffer.concat([length, message]), env: { ...process.env, PAGE_COLLECTOR_EXPORT_DIRECTORY: directory, PAGE_COLLECTOR_PROJECT_EXPORT_DIRECTORY: ".page-collector" } });
+  assert.equal(result.status, 0);
+  assert.equal(fs.readFileSync(path.join(directory, ".page-collector", "Settings", "PAGE_SPEC.md"), "utf8"), "# Settings\n");
+});

@@ -2,12 +2,12 @@ import { DEFAULT_LOCALE, LOCALES, MESSAGES, translate } from "./i18n.js";
 
 const TYPE_KEYS = ["hero", "navigation", "dashboard", "applicationShell", "dataTable", "logos", "features", "content", "steps", "cta", "pricing", "testimonials", "faq", "footer", "other"];
 const $ = selector => document.querySelector(selector);
-const state = { spec: null, pending: null, locale: DEFAULT_LOCALE, workspace: null };
+const state = { spec: null, pending: null, locale: DEFAULT_LOCALE, workspace: null, expandedBlockId: null };
 const t = key => translate(state.locale, key);
 const safeFileName = value => String(value || "block").normalize("NFKD").replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || "block";
 
 function defaultSpec() {
-  return { id: crypto.randomUUID(), version: 2, project: APP_CONFIG.defaultProject, page: APP_CONFIG.defaultPage, route: APP_CONFIG.defaultRoute, framework: "Next.js", ui: "shadcn/ui", blocks: [] };
+  return { id: crypto.randomUUID(), version: 2, project: APP_CONFIG.defaultProject, projectDirectory: "", page: APP_CONFIG.defaultPage, pageMode: "create", route: APP_CONFIG.defaultRoute, framework: "Next.js", ui: "shadcn/ui", blocks: [] };
 }
 
 function defaultWorkspace(spec) { return { version: 1, activeSpecId: spec.id, specs: [spec] }; }
@@ -73,10 +73,19 @@ async function hydrate() {
   if (!legacySpec.id) legacySpec.id = crypto.randomUUID();
   state.workspace = stored.workspace?.specs?.length ? stored.workspace : defaultWorkspace(legacySpec);
   state.spec = state.workspace.specs.find(spec => spec.id === state.workspace.activeSpecId) || state.workspace.specs[0];
+  state.spec.projectDirectory ||= "";
+  state.spec.pageMode ||= "create";
   state.spec.version = 2;
   state.spec.blocks = state.spec.blocks.map(block => ({ ...block, typeKey: normalizeTypeKey(block) }));
   state.pending = stored.pendingCapture || null;
+  const existing = state.pending && state.spec.blocks.find(block => block.url === state.pending.url);
+  if (existing) {
+    state.expandedBlockId = existing.id;
+    state.pending = null;
+    await chrome.storage.local.remove("pendingCapture");
+  }
   render();
+  if (existing) status(t("alreadyAdded"));
   await chrome.runtime.sendMessage({ type: "panel-ready" });
   await chrome.runtime.sendMessage({ type: "set-locale", locale: state.locale });
   if (!state.pending) {
@@ -93,7 +102,9 @@ function markdown(spec) {
     return `## ${String(index + 1).padStart(2, "0")} — ${messages.types[normalizeTypeKey(block)]}\n\n${t("source")}: ${block.url}${reference}\n\nRegistry: \`${block.registry}\`\n\n${t("install")}: \`${block.installCommand}\`\n\n${t("changes")}:\n${block.instructions || t("fallbackChange")}`;
   }).join("\n\n---\n\n");
   const steps = t("agentSteps").map((step, index) => `${index + 1}. ${step}`).join("\n");
-  return `# ${t("specTitle")}\n\n${t("project")}: ${spec.project}\n${t("page")}: ${spec.page}\n${t("targetRoute")}: ${spec.route}\n${t("framework")}: ${spec.framework}\nUI: ${spec.ui}\n${t("sourceLibrary")}: Shadcn Blocks\n\n## ${t("generalInstructions")}\n\n${t("generalText")}\n\n---\n\n${sections}\n\n## ${t("agentInstructions")}\n\n${steps}\n`;
+  const projectDirectory = spec.projectDirectory ? `\n${t("projectFolder")}: ${spec.projectDirectory}` : "";
+  const pageMode = t(spec.pageMode === "edit" ? "editPage" : "createPage");
+  return `# ${t("specTitle")}\n\n${t("project")}: ${spec.project}${projectDirectory}\n${t("page")}: ${spec.page}\n${t("pageMode")}: ${pageMode}\n${t("targetRoute")}: ${spec.route}\n${t("framework")}: ${spec.framework}\nUI: ${spec.ui}\n${t("sourceLibrary")}: Shadcn Blocks\n\n## ${t("generalInstructions")}\n\n${t("generalText")}\n\n---\n\n${sections}\n\n## ${t("agentInstructions")}\n\n${steps}\n`;
 }
 
 async function persist() {
@@ -113,6 +124,14 @@ function renderWorkspace() {
   })));
 }
 
+function renderPageMode() {
+  $("#page-mode").replaceChildren(...["create", "edit"].map(value => Object.assign(document.createElement("option"), {
+    value,
+    textContent: t(value === "create" ? "createPage" : "editPage"),
+    selected: state.spec.pageMode === value
+  })));
+}
+
 async function createSpec(project, page) {
   const spec = { ...defaultSpec(), project, page };
   state.workspace.specs.push(spec);
@@ -120,11 +139,28 @@ async function createSpec(project, page) {
   await persist();
 }
 
+async function requestProjectFolder() {
+  const response = await chrome.runtime.sendMessage({ type: "native", payload: { action: "choose-directory", prompt: t("projectFolder") } });
+  if (response?.ok) return response;
+  if (!response?.canceled) status(`${t("chooseFolderFailed")}: ${response?.error || t("unknownError")}`);
+  return null;
+}
+
+async function chooseFolderForCurrentSpec() {
+  const selected = await requestProjectFolder();
+  if (!selected) return;
+  state.spec.projectDirectory = selected.directory;
+  state.spec.project = selected.name;
+  await persist();
+}
+
 function render() {
   applyTranslations();
   renderLanguageSwitcher();
   renderWorkspace();
-  $("#project").value = state.spec.project;
+  renderPageMode();
+  $("#project-folder").textContent = state.spec.projectDirectory || t("noFolder");
+  $("#project-folder").title = state.spec.projectDirectory || t("noFolder");
   $("#page").value = state.spec.page;
   $("#route").value = state.spec.route;
   $("#page-title").textContent = state.spec.page;
@@ -133,14 +169,26 @@ function render() {
   $("#blocks").replaceChildren(...state.spec.blocks.map((block, index) => {
     const li = document.createElement("li");
     li.className = "block";
-    li.innerHTML = `<span class="block-order">${String(index + 1).padStart(2, "0")}</span><div class="block-copy"><strong></strong><small></small></div><button type="button">↑</button><button type="button">↓</button><button type="button">×</button>`;
+    const expanded = state.expandedBlockId === block.id;
+    li.setAttribute("aria-expanded", String(expanded));
+    li.innerHTML = `<div class="block-summary"><span class="block-order">${String(index + 1).padStart(2, "0")}</span><div class="block-copy"><strong></strong><small></small></div><button type="button">↑</button><button type="button">↓</button><button type="button">×</button><button type="button" class="block-toggle">⌄</button></div><div class="block-details" ${expanded ? "" : "hidden"}><a target="_blank" rel="noreferrer"></a><span class="detail-registry"></span><code class="detail-install"></code><p class="detail-notes"></p><span class="detail-screenshot"></span></div>`;
     li.querySelector("strong").textContent = MESSAGES[state.locale].types[normalizeTypeKey(block)];
     li.querySelector("small").textContent = `${block.slug}${block.screenshotId ? " · 📷" : ""}`;
+    const link = li.querySelector("a");
+    link.href = block.url;
+    link.textContent = `${t("openSource")} ↗`;
+    li.querySelector(".detail-registry").textContent = `${t("registryLabel")}: ${block.registry}`;
+    li.querySelector(".detail-install").textContent = block.installCommand;
+    li.querySelector(".detail-notes").textContent = block.instructions ? `${t("notesLabel")}: ${block.instructions}` : "";
+    li.querySelector(".detail-screenshot").textContent = block.screenshotId ? `✓ ${t("screenshotIncluded")}` : "";
     const buttons = li.querySelectorAll("button");
     [[buttons[0], "moveUp"], [buttons[1], "moveDown"], [buttons[2], "removeBlock"]].forEach(([button, key]) => { button.title = t(key); button.setAttribute("aria-label", t(key)); });
-    buttons[0].onclick = () => move(index, -1);
-    buttons[1].onclick = () => move(index, 1);
-    buttons[2].onclick = () => remove(index);
+    buttons[0].onclick = event => { event.stopPropagation(); void move(index, -1); };
+    buttons[1].onclick = event => { event.stopPropagation(); void move(index, 1); };
+    buttons[2].onclick = event => { event.stopPropagation(); void remove(index); };
+    const toggle = () => { state.expandedBlockId = expanded ? null : block.id; render(); };
+    buttons[3].onclick = event => { event.stopPropagation(); toggle(); };
+    li.querySelector(".block-summary").onclick = toggle;
     return li;
   }));
   $("#capture").hidden = !state.pending;
@@ -197,17 +245,26 @@ $("#saved-pages").onchange = async event => {
   const next = state.workspace.specs.find(spec => spec.id === event.target.value);
   if (!next) return;
   state.spec = next;
+  state.spec.projectDirectory ||= "";
+  state.spec.pageMode ||= "create";
   await persist();
 };
 $("#new-project").onclick = async () => {
-  const project = prompt(t("projectNamePrompt"), "");
-  if (project?.trim()) await createSpec(project.trim(), APP_CONFIG.defaultPage);
+  const selected = await requestProjectFolder();
+  if (!selected) return;
+  const page = prompt(t("pageNamePrompt"), APP_CONFIG.defaultPage);
+  if (!page?.trim()) return;
+  await createSpec(selected.name, page.trim());
+  state.spec.projectDirectory = selected.directory;
+  await persist();
 };
 $("#new-page").onclick = async () => {
   const page = prompt(t("pageNamePrompt"), "");
   if (page?.trim()) await createSpec(state.spec.project, page.trim());
 };
-for (const field of ["project", "page", "route"]) $("#" + field).onchange = async event => { state.spec[field] = event.target.value.trim(); await persist(); };
+$("#choose-folder").onclick = chooseFolderForCurrentSpec;
+for (const field of ["page", "route"]) $("#" + field).onchange = async event => { state.spec[field] = event.target.value.trim(); await persist(); };
+$("#page-mode").onchange = async event => { state.spec.pageMode = event.target.value; await persist(); };
 $("#discard").addEventListener("click", discardPending);
 $("#add").onclick = async () => {
   const addButton = $("#add");
@@ -245,9 +302,18 @@ $("#export").onclick = async () => {
   const response = await chrome.runtime.sendMessage({ type: "native", payload: { action: "export", spec: state.spec, markdown: markdown(state.spec), screenshots } });
   status(response?.ok ? `${t("saved")}: ${response.directory}` : `${t("exportFailed")}: ${response?.error || t("unknownError")}`);
 };
-chrome.storage.onChanged.addListener((changes, area) => {
+chrome.storage.onChanged.addListener(async (changes, area) => {
   if (area === "local" && changes.pendingCapture) {
-    state.pending = changes.pendingCapture.newValue || null;
+    const pending = changes.pendingCapture.newValue || null;
+    const existing = pending && state.spec.blocks.find(block => block.url === pending.url);
+    if (existing) {
+      state.pending = null;
+      state.expandedBlockId = existing.id;
+      await chrome.storage.local.remove("pendingCapture");
+      status(t("alreadyAdded"));
+    } else {
+      state.pending = pending;
+    }
     render();
   }
 });
