@@ -1,0 +1,20 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import crypto from "node:crypto";
+
+const root = path.resolve(import.meta.dirname, "..");
+const env = Object.fromEntries(fs.readFileSync(path.join(root, ".env"), "utf8").split(/\r?\n/).filter(line => line && !line.startsWith("#")).map(line => { const i=line.indexOf("="); return [line.slice(0,i),line.slice(i+1)]; }));
+function extensionIdFromKey(publicKey) {
+  const digest = crypto.createHash("sha256").update(Buffer.from(publicKey, "base64")).digest("hex").slice(0, 32);
+  return [...digest].map(character => String.fromCharCode(Number.parseInt(character, 16) + 97)).join("");
+}
+const extensionId = process.argv[2] || extensionIdFromKey(env.EXTENSION_PUBLIC_KEY);
+if (!/^[a-p]{32}$/.test(extensionId)) throw new Error("Could not determine a valid Chrome extension ID");
+const hostDir = path.join(os.homedir(), "Library", "Application Support", "Google", "Chrome", "NativeMessagingHosts");
+const runtimeDir = path.join(os.homedir(), "Library", "Application Support", env.APP_NAME);
+fs.mkdirSync(hostDir, { recursive: true }); fs.mkdirSync(runtimeDir, { recursive: true });
+const launcher = path.join(runtimeDir, "native-host.sh");
+fs.writeFileSync(launcher, `#!/bin/sh\nexport PAGE_COLLECTOR_EXPORT_DIRECTORY=${JSON.stringify(env.EXPORT_DIRECTORY)}\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(path.join(root,"native-host","host.mjs"))}\n`, { mode: 0o700 });
+fs.writeFileSync(path.join(hostDir, `${env.NATIVE_HOST_NAME}.json`), JSON.stringify({ name: env.NATIVE_HOST_NAME, description: `${env.APP_NAME} local export host`, path: launcher, type: "stdio", allowed_origins: [`chrome-extension://${extensionId}/`] }, null, 2) + "\n");
+console.log(`Installed native host for ${extensionId}`);

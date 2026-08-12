@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Shadcn Page Collector</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <div class="mark">PC</div>
+      <div><p class="eyebrow" data-i18n="designIntent"></p><h1 id="app-title"></h1></div>
+      <button type="button" id="settings-toggle" class="icon-button" data-i18n-title="projectSettings">⋯</button>
+    </header>
+
+    <section id="settings" class="settings" hidden>
+      <label><span data-i18n="project"></span><input id="project" autocomplete="off"></label>
+      <label><span data-i18n="page"></span><input id="page" autocomplete="off"></label>
+      <label><span data-i18n="targetRoute"></span><input id="route" autocomplete="off"></label>
+    </section>
+
+    <section id="capture" class="capture" hidden>
+      <p class="eyebrow" data-i18n="newBlock"></p>
+      <h2 id="capture-title"></h2>
+      <p id="capture-registry" class="registry"></p>
+      <div class="grid">
+        <label><span data-i18n="sectionType"></span><select id="block-type"></select></label>
+        <label><span data-i18n="position"></span><input id="position" type="number" min="1"></label>
+      </div>
+      <label><span data-i18n="implementationNotes"></span><textarea id="instructions" rows="5" data-i18n-placeholder="notesPlaceholder"></textarea></label>
+      <div class="actions"><button type="button" id="discard" class="secondary" data-i18n="discard"></button><button type="button" id="add" data-i18n="addBlock"></button></div>
+    </section>
+
+    <section class="collection">
+      <div class="section-heading"><div><p class="eyebrow" data-i18n="currentPage"></p><h2 id="page-title"></h2></div><span id="count" class="count">0</span></div>
+      <ol id="blocks" class="blocks"></ol>
+      <div id="empty" class="empty"><span>⇧⌘K</span><p data-i18n="emptyHint"></p></div>
+    </section>
+
+    <footer>
+      <p id="status" role="status"></p>
+      <div class="actions"><button type="button" id="copy" class="secondary" data-i18n="copyPrompt"></button><button type="button" id="export" data-i18n="finishPage"></button></div>
+      <nav id="language-switcher" class="language-switcher" aria-label="Language"></nav>
+    </footer>
+  </main>
+  <script src="config.js"></script>
+  <script type="module" src="panel.js"></script>
+</body>
+</html>

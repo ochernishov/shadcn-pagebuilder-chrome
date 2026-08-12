@@ -1,0 +1,30 @@
+name: Bug report
+description: Report a reproducible problem in the extension or native host
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: Describe the observed and expected behavior.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Extension version
+      placeholder: "0.3.0"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Chrome and operating system
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Console output or screenshots

@@ -1,0 +1,10 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+const root = path.resolve(import.meta.dirname, "..");
+const lines = fs.readFileSync(path.join(root, ".env"), "utf8").split(/\r?\n/);
+const hostName = lines.find(line => line.startsWith("NATIVE_HOST_NAME="))?.split("=").slice(1).join("=");
+if (!hostName) throw new Error("NATIVE_HOST_NAME is missing");
+const manifest = path.join(os.homedir(), "Library", "Application Support", "Google", "Chrome", "NativeMessagingHosts", `${hostName}.json`);
+fs.rmSync(manifest, { force: true });
+console.log(`Removed ${manifest}`);

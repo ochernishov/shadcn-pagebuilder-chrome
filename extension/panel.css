@@ -1,0 +1,67 @@
+:root {
+  font-synthesis: none;
+}
+@font-face {
+  font-family: "Geologica";
+  src: url("fonts/Geologica-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+:root {
+  --ink: #17201b;
+  --muted: #68716b;
+  --paper: #f2f0e9;
+  --card: #fbfaf6;
+  --line: #d7d4ca;
+  --accent: #ff5c35;
+  --accent-dark: #d63a17;
+  --space-1: clamp(.38rem, 1vw, .55rem);
+  --space-2: clamp(.7rem, 2vw, 1rem);
+  --space-3: clamp(1rem, 3vw, 1.45rem);
+  --radius: clamp(.7rem, 2vw, 1rem);
+  --text-small: clamp(.72rem, 2vw, .82rem);
+  --text-body: clamp(.88rem, 2.5vw, 1rem);
+  --text-title: clamp(1.35rem, 5vw, 1.9rem);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 500 var(--text-body)/1.45 "Geologica", "PingFang SC", sans-serif; }
+button, input, select, textarea { font: inherit; }
+button { border: 0; border-radius: calc(var(--radius) * .7); padding: var(--space-1) var(--space-2); background: var(--ink); color: white; cursor: pointer; transition: transform 150ms ease, background 150ms ease; }
+button:hover { transform: translateY(-1px); background: var(--accent-dark); }
+.shell { min-height: 100vh; padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
+.masthead, .section-heading, .actions, .block { display: flex; align-items: center; }
+.masthead { gap: var(--space-2); }
+.masthead h1, h2, p { margin: 0; }
+.masthead h1 { font: 720 var(--text-title)/1.05 "Geologica", sans-serif; letter-spacing: -.035em; }
+.mark { display: grid; place-items: center; inline-size: clamp(2.5rem, 10vw, 3.2rem); aspect-ratio: 1; border-radius: 50%; background: var(--accent); color: white; font-weight: 800; transform: rotate(-8deg); }
+.icon-button { margin-left: auto; background: transparent; color: var(--ink); font-size: var(--text-title); padding: 0; }
+.eyebrow { color: var(--muted); font-size: var(--text-small); font-weight: 800; letter-spacing: .13em; }
+.settings, .capture { display: grid; gap: var(--space-2); padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: 0 .7rem 2rem rgba(23,32,27,.06); }
+label { display: grid; gap: calc(var(--space-1) * .5); color: var(--muted); font-size: var(--text-small); font-weight: 700; }
+input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: calc(var(--radius) * .55); background: white; color: var(--ink); padding: var(--space-1); outline: none; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 .18rem rgba(255,92,53,.15); }
+textarea { resize: vertical; }
+.grid { display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-2); }
+.registry { color: var(--accent-dark); font-family: ui-monospace, monospace; font-size: var(--text-small); overflow-wrap: anywhere; }
+.section-heading { justify-content: space-between; }
+.count { display: grid; place-items: center; min-inline-size: 2rem; aspect-ratio: 1; border-radius: 50%; background: var(--ink); color: white; }
+.blocks { display: grid; gap: var(--space-1); padding: 0; list-style: none; }
+.block { gap: var(--space-2); padding: var(--space-2); border-block-end: 1px solid var(--line); }
+.block-order { color: var(--accent-dark); font: 700 var(--text-body)/1 "Geologica", sans-serif; }
+.block-copy { min-width: 0; flex: 1; }
+.block-copy strong, .block-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.block-copy small { color: var(--muted); }
+.block button { padding: .2rem .45rem; background: transparent; color: var(--muted); }
+.empty { margin-block: clamp(2rem, 10vh, 5rem); text-align: center; color: var(--muted); }
+.empty span { display: inline-block; padding: var(--space-1) var(--space-2); border: 1px solid var(--line); border-radius: .5rem; background: var(--card); color: var(--ink); box-shadow: 0 .2rem 0 var(--line); }
+footer { margin-top: auto; }
+.actions { justify-content: flex-end; gap: var(--space-1); }
+.secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+#status { min-height: 1.5em; margin-block-end: var(--space-1); color: var(--muted); font-size: var(--text-small); text-align: right; }
+.language-switcher { display: flex; justify-content: center; gap: calc(var(--space-1) * .35); margin-block-start: var(--space-2); padding-block-start: var(--space-2); border-block-start: 1px solid var(--line); }
+.language-switcher button { min-inline-size: clamp(2rem, 8vw, 2.7rem); padding: calc(var(--space-1) * .55); border: 1px solid transparent; background: transparent; color: var(--muted); font-size: var(--text-small); font-weight: 750; }
+.language-switcher button:hover { transform: none; border-color: var(--line); background: var(--card); color: var(--ink); }
+.language-switcher button[aria-current="true"] { border-color: var(--ink); background: var(--ink); color: white; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
