@@ -1,30 +1,47 @@
-# Screenshot brief
+# Public screenshot brief
 
-Replace the planned files below with final PNG screenshots. Keep filenames unchanged so the public README can be updated without restructuring documentation.
+Place the seven final PNG files in this directory with the exact names below. README links are already prepared for these slots.
 
-## Shared capture requirements
+## Shared requirements
 
-- Chrome at 100% zoom.
-- Side panel wide enough to avoid clipped controls.
-- English interface for the primary set.
-- No personal profile data, tokens, local paths, or paid source code visible.
-- Use one coherent demo project and page across all frames.
-- Prefer a 16:10 or 16:9 canvas with the browser chrome cropped consistently.
+- Use Chrome at 100% zoom and a consistent 16:10 or 16:9 crop.
+- Use a neutral demo project such as `acme-demo`; do not show real client or personal projects.
+- Hide bookmarks, profile photos, email addresses, notifications, tokens, local personal paths, and paid source code.
+- A paid product's public preview may be visible, but never show its proprietary code or an account-only download.
+- Use the English interface for screenshots 01–06.
+- Keep the side panel wide enough that labels and controls are not clipped.
+- Prefer PNG at 1600 px or wider; do not add artificial browser mockup frames.
 
-## Slots
+## Required files
 
-### `01-capture-block.png`
+### `01-project-setup.png`
 
-Show a specific Shadcn Block detail page and the open collector. Include detected title, registry ID, semantic type, position, notes field, Discard, and Add block.
+Open the project settings. Show a sanitized selected folder named `acme-demo`, page `Landing Page`, route `/`, and **Create** mode. The saved-pages selector and **+ Project / + Page** actions must be visible.
 
-### `02-page-outline.png`
+### `02-source-capture.png`
 
-Show a realistic outline with at least five blocks. Include order numbers, semantic labels, slugs, counter, and reorder/remove actions.
+Open a public component-library detail page with the Collector side panel. Show the pending source title/domain, semantic section type, position, implementation notes, enabled screenshot option, **Discard**, and **Add block**.
 
-### `03-language-switcher.png`
+### `03-region-capture.png`
 
-Show the same populated outline in one non-English locale with the language switcher visible. The frame must demonstrate that existing block labels were translated.
+Use an ordinary public website or gallery. Show the visible rectangle-selection overlay around one section. An inset may show the resulting cropped preview expanded in Collector.
 
-### `04-export.png`
+### `04-page-outline.png`
 
-Show `PAGE_SPEC.md` and `page-spec.json` in an editor. Include the project header, at least two block sections, registry commands, and agent instructions.
+Show at least five ordered items, including at least one normal source and one **Visual reference**. Expand one item so its source link, notes, screenshot state, and preview are visible. Include reorder and remove controls.
+
+### `05-finish-page.png`
+
+Show the successful result card after **Finish page**, including a demo six-digit number and **Copy number**. The displayed path must contain only a sanitized demo path; no `/Users/<real-name>/...` path.
+
+### `06-agent-skill.png`
+
+Show Codex or Claude Code opened in the same demo project after the command `Collector 482731`. The response should visibly confirm the matching route, item count, source/reference split, and planned authorized-install/original-implementation decisions. Hide unrelated tasks and account data.
+
+### `07-languages.png`
+
+Create a clean contact sheet with five equal frames: EN, RU, FR, IT, and 中文. Use the untouched built-in project/page values so the frames visibly show `My Website / Landing Page`, `Мой сайт / Лендинг`, `Mon site / Page d’accueil`, `Il mio sito / Pagina di destinazione`, and `我的网站 / 落地页`. The bottom language switcher must be visible in every frame.
+
+## Before committing
+
+Inspect every image at 100% size. Search visible text for personal names, email, API keys, bearer tokens, private domains, filesystem paths, and customer data. Only sanitized documentation screenshots belong in the public repository.

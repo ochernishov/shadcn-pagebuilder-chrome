@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shadcn Collector"
+  short_description: "Open and implement a collected page by number"
+  default_prompt: "Use $shadcn-collector with collection number 482731 and implement the saved page specification."

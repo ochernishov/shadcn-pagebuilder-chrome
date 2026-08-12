@@ -2,6 +2,49 @@
 
 ## [Unreleased] — 2026-08-12
 
+## [0.8.0] — 2026-08-12
+
+### Added
+
+- Public-repository data boundary, permission reference, complete macOS installation/update/removal guide, and exact screenshot brief.
+- Automatic deny-by-default `Collector/.gitignore` for local page specifications and screenshots.
+
+### Changed
+
+- Built-in project and page names now switch completely across EN, RU, FR, IT, and ZH, while user-entered names and real folder names remain untouched.
+- The canonical `shadcn-collector` skill is now written in English for public Codex and Claude Code installations.
+- Release archives now include changelog and security documentation.
+
+## [0.7.0] — 2026-08-12
+
+### Added
+
+- Collision-checked six-digit Collector IDs and isolated `<project>/Collector/<id>/` export folders.
+- Persistent export result card with the package number, path, and Copy number action.
+- Shared global `shadcn-collector` skill for Codex and Claude Code.
+- Deterministic skill resolver that validates and opens the exact numbered package from the current project.
+
+### Changed
+
+- The macOS installer now installs the Native Host and the shared coding-agent skill together.
+- Release archives now include the canonical skill source.
+
+## [0.6.0] — 2026-08-12
+
+### Added
+
+- Source-neutral capture on any configured HTTP or HTTPS website.
+- **+ Screenshot** action with an in-page drag selector, precise PNG cropping, automatic outline insertion, and expandable local preview.
+- Explicit `source` and `visual-reference` item kinds in specification version 3.
+- Localized region-selection and agent-decision instructions in EN, RU, FR, IT, and ZH.
+
+### Changed
+
+- Subscription and source-access decisions now belong to the implementation agent, not the Collector.
+- New captures store factual source metadata instead of generating a Shadcn Blocks registry command.
+- The extension uses temporary `activeTab` access and does not request persistent all-sites host permission.
+- Exported instructions tell agents to use official installers only when authorized and otherwise create an original implementation from the visible reference.
+
 ## [0.5.0] — 2026-08-12
 
 ### Added

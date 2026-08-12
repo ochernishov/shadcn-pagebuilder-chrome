@@ -36,15 +36,22 @@
     </section>
 
     <section class="collection">
-      <div class="section-heading"><div><p class="eyebrow" data-i18n="currentPage"></p><h2 id="page-title"></h2></div><span id="count" class="count">0</span></div>
+      <div class="section-heading">
+        <div><p class="eyebrow" data-i18n="currentPage"></p><h2 id="page-title"></h2></div>
+        <div class="collection-tools"><button type="button" id="add-screenshot" class="secondary capture-region"><span aria-hidden="true">＋</span><span data-i18n="addScreenshot"></span></button><span id="count" class="count">0</span></div>
+      </div>
       <ol id="blocks" class="blocks"></ol>
       <div id="empty" class="empty"><span>⇧⌘K</span><p data-i18n="emptyHint"></p></div>
     </section>
 
     <footer>
       <p id="status" role="status"></p>
+      <section id="export-result" class="export-result" hidden aria-live="polite">
+        <div><span data-i18n="collectorReady"></span><strong id="collection-id"></strong><small id="collection-path"></small></div>
+        <button type="button" id="copy-collection-id" class="secondary" data-i18n="copyNumber"></button>
+      </section>
       <div class="actions"><button type="button" id="copy" class="secondary" data-i18n="copyPrompt"></button><button type="button" id="export" data-i18n="finishPage"></button></div>
-      <nav id="language-switcher" class="language-switcher" aria-label="Language"></nav>
+      <nav id="language-switcher" class="language-switcher" data-i18n-aria-label="languageSwitcher"></nav>
     </footer>
   </main>
   <script src="config.js"></script>
