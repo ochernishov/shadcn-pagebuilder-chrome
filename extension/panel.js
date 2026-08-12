@@ -2,7 +2,7 @@ import { DEFAULT_LOCALE, LOCALES, MESSAGES, localizeSystemLabels, migrateSystemL
 
 const TYPE_KEYS = ["hero", "navigation", "dashboard", "applicationShell", "dataTable", "logos", "features", "content", "steps", "cta", "pricing", "testimonials", "faq", "footer", "other"];
 const $ = selector => document.querySelector(selector);
-const state = { spec: null, pending: null, locale: DEFAULT_LOCALE, workspace: null, expandedBlockId: null, screenshots: {}, settingsExpanded: true, workflowMode: "page", workflowDrafts: { page: null, single: null }, singleItem: null };
+const state = { spec: null, pending: null, locale: DEFAULT_LOCALE, expandedBlockId: null, screenshots: {}, settingsExpanded: true, workflowMode: "page", workflowDrafts: { page: null, single: null }, singleItem: null };
 let folderPickerOpen = false;
 const t = key => translate(state.locale, key);
 const safeFileName = value => String(value || "block").normalize("NFKD").replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || "block";
@@ -10,8 +10,6 @@ const safeFileName = value => String(value || "block").normalize("NFKD").replace
 function defaultSpec() {
   return { id: crypto.randomUUID(), version: 4, project: t("defaultProjectName"), projectLabelKey: "defaultProjectName", projectDirectory: "", page: t("defaultPageName"), pageLabelKey: "defaultPageName", pageMode: "create", route: APP_CONFIG.defaultRoute, framework: "Next.js", ui: "shadcn/ui", blocks: [] };
 }
-
-function defaultWorkspace(spec) { return { version: 1, activeSpecId: spec.id, specs: [spec] }; }
 
 function inferTypeKey(capture) {
   const value = `${capture?.slug || ""} ${capture?.title || ""}`.toLowerCase();
@@ -63,8 +61,8 @@ function renderLanguageSwitcher() {
 async function setLocale(locale) {
   if (!MESSAGES[locale]) return;
   state.locale = locale;
-  state.workspace.specs.forEach(spec => localizeSystemLabels(spec, locale));
-  await chrome.storage.local.set({ locale, pageSpec: state.spec, workspace: state.workspace });
+  localizeSystemLabels(state.spec, locale);
+  await chrome.storage.local.set({ locale, pageSpec: state.spec });
   await chrome.runtime.sendMessage({ type: "set-locale", locale });
   render();
 }
@@ -72,17 +70,15 @@ async function setLocale(locale) {
 async function hydrate() {
   const stored = await chrome.storage.local.get(["pageSpec", "workspace", "pendingCapture", "locale", "screenshots", "settingsExpanded", "workflowMode", "workflowDrafts", "singleItem"]);
   state.locale = MESSAGES[stored.locale] ? stored.locale : DEFAULT_LOCALE;
-  const legacySpec = stored.pageSpec || defaultSpec();
+  const legacyWorkspaceSpec = stored.workspace?.specs?.find(spec => spec.id === stored.workspace.activeSpecId) || stored.workspace?.specs?.[0];
+  const legacySpec = stored.pageSpec || legacyWorkspaceSpec || defaultSpec();
   if (!legacySpec.id) legacySpec.id = crypto.randomUUID();
-  state.workspace = stored.workspace?.specs?.length ? stored.workspace : defaultWorkspace(legacySpec);
-  state.workspace.specs.forEach(spec => {
-    spec.projectDirectory ||= "";
-    spec.pageMode ||= "create";
-    spec.version = 4;
-    spec.blocks = (spec.blocks || []).map(block => ({ ...block, kind: block.kind || "source", typeKey: normalizeTypeKey(block) }));
-    migrateSystemLabels(spec, state.locale, { project: APP_CONFIG.defaultProject, page: APP_CONFIG.defaultPage });
-  });
-  state.spec = state.workspace.specs.find(spec => spec.id === state.workspace.activeSpecId) || state.workspace.specs[0];
+  legacySpec.projectDirectory ||= "";
+  legacySpec.pageMode ||= "create";
+  legacySpec.version = 4;
+  legacySpec.blocks = (legacySpec.blocks || []).map(block => ({ ...block, kind: block.kind || "source", typeKey: normalizeTypeKey(block) }));
+  migrateSystemLabels(legacySpec, state.locale, { project: APP_CONFIG.defaultProject, page: APP_CONFIG.defaultPage });
+  state.spec = legacySpec;
   state.settingsExpanded = typeof stored.settingsExpanded === "boolean" ? stored.settingsExpanded : !state.spec.projectDirectory;
   state.workflowMode = stored.workflowMode === "single" ? "single" : "page";
   state.workflowDrafts = { page: null, single: null, ...stored.workflowDrafts };
@@ -98,6 +94,8 @@ async function hydrate() {
     await chrome.storage.local.remove("pendingCapture");
     await chrome.storage.local.set({ workflowDrafts: state.workflowDrafts });
   }
+  await chrome.storage.local.set({ pageSpec: state.spec });
+  await chrome.storage.local.remove("workspace");
   render();
   if (existing) status(t("alreadyAdded"));
   await chrome.runtime.sendMessage({ type: "panel-ready" });
@@ -123,20 +121,8 @@ function markdown(spec) {
 }
 
 async function persist() {
-  const index = state.workspace.specs.findIndex(spec => spec.id === state.spec.id);
-  if (index >= 0) state.workspace.specs[index] = state.spec;
-  else state.workspace.specs.push(state.spec);
-  state.workspace.activeSpecId = state.spec.id;
-  await chrome.storage.local.set({ pageSpec: state.spec, workspace: state.workspace });
+  await chrome.storage.local.set({ pageSpec: state.spec });
   render();
-}
-
-function renderWorkspace() {
-  $("#saved-pages").replaceChildren(...state.workspace.specs.map(spec => Object.assign(document.createElement("option"), {
-    value: spec.id,
-    textContent: `${spec.project} / ${spec.page}`,
-    selected: spec.id === state.spec.id
-  })));
 }
 
 function renderPageMode() {
@@ -213,21 +199,10 @@ async function setSettingsExpanded(expanded) {
   renderSettings();
 }
 
-async function createSpec(project, page, labelKeys = {}) {
-  const spec = { ...defaultSpec(), project, page };
-  if (labelKeys.projectLabelKey) spec.projectLabelKey = labelKeys.projectLabelKey;
-  else delete spec.projectLabelKey;
-  if (labelKeys.pageLabelKey) spec.pageLabelKey = labelKeys.pageLabelKey;
-  else delete spec.pageLabelKey;
-  state.workspace.specs.push(spec);
-  state.spec = spec;
-  await persist();
-}
-
 async function requestProjectFolder() {
   if (folderPickerOpen) return null;
   folderPickerOpen = true;
-  const buttons = [$("#choose-folder"), $("#new-project")];
+  const buttons = [$("#choose-folder")];
   buttons.forEach(button => { button.disabled = true; });
   try {
     const response = await chrome.runtime.sendMessage({ type: "native", payload: { action: "choose-directory", prompt: t("projectFolder") } });
@@ -254,7 +229,6 @@ async function chooseFolderForCurrentSpec() {
 function render() {
   applyTranslations();
   renderLanguageSwitcher();
-  renderWorkspace();
   renderPageMode();
   renderSettings();
   renderWorkflow();
@@ -518,6 +492,24 @@ async function discardPending() {
   }
 }
 
+async function resetPageAfterExport() {
+  const pageScreenshotIds = new Set(state.spec.blocks.map(block => block.screenshotId).filter(Boolean));
+  pageScreenshotIds.forEach(id => { delete state.screenshots[id]; });
+  state.spec = defaultSpec();
+  state.pending = null;
+  state.workflowDrafts.page = null;
+  state.expandedBlockId = null;
+  state.settingsExpanded = true;
+  await chrome.storage.local.remove(["pendingCapture", "workspace"]);
+  await chrome.storage.local.set({
+    pageSpec: state.spec,
+    screenshots: state.screenshots,
+    workflowDrafts: state.workflowDrafts,
+    settingsExpanded: true
+  });
+  render();
+}
+
 $("#settings-toggle").onclick = () => setSettingsExpanded(!state.settingsExpanded);
 document.querySelectorAll("[data-workflow-mode]").forEach(button => {
   button.onclick = () => setWorkflowMode(button.dataset.workflowMode);
@@ -536,30 +528,6 @@ $("#clear-single").onclick = clearSingleItem;
 $("#copy-collection-id").onclick = async () => {
   await navigator.clipboard.writeText($("#collection-id").textContent);
   status(t("numberCopied"));
-};
-$("#saved-pages").onchange = async event => {
-  const next = state.workspace.specs.find(spec => spec.id === event.target.value);
-  if (!next) return;
-  state.spec = next;
-  state.spec.projectDirectory ||= "";
-  state.spec.pageMode ||= "create";
-  await persist();
-};
-$("#new-project").onclick = async () => {
-  const selected = await requestProjectFolder();
-  if (!selected) return;
-  const page = prompt(t("pageNamePrompt"), t("defaultPageName"));
-  if (!page?.trim()) return;
-  const usesDefaultPage = page.trim() === t("defaultPageName");
-  await createSpec(selected.name, page.trim(), usesDefaultPage ? { pageLabelKey: "defaultPageName" } : {});
-  state.spec.projectDirectory = selected.directory;
-  state.settingsExpanded = false;
-  await chrome.storage.local.set({ settingsExpanded: false });
-  await persist();
-};
-$("#new-page").onclick = async () => {
-  const page = prompt(t("pageNamePrompt"), "");
-  if (page?.trim()) await createSpec(state.spec.project, page.trim(), { projectLabelKey: state.spec.projectLabelKey });
 };
 $("#choose-folder").onclick = chooseFolderForCurrentSpec;
 for (const field of ["page", "route"]) $("#" + field).onchange = async event => {
@@ -616,6 +584,7 @@ $("#export").onclick = async () => {
     $("#collection-path").textContent = response.directory;
     $("#collection-path").title = response.directory;
     $("#export-result").hidden = false;
+    await resetPageAfterExport();
     status(`${t("saved")}: ${response.directory}`);
   } else {
     status(`${t("exportFailed")}: ${response?.error || t("unknownError")}`);

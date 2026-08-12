@@ -6,7 +6,7 @@ Shadcn Page Collector is local-first.
 
 The extension stores selected local project paths, project names, page names, Create/Edit mode, target routes, selected language, source metadata, ordering, notes that you enter, and screenshots that you explicitly request.
 
-Page collections and the standalone **One block** result are stored separately. Switching modes does not send or merge their data.
+The current page collection and the standalone **One block** result are stored separately. Switching modes does not send or merge their data. After a successful **Finish page** export, the finished page state and its page screenshots are removed from browser storage; the exported local package and the independent standalone result remain available.
 
 ## Where data is stored
 

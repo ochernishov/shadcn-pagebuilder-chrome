@@ -16,11 +16,15 @@ test("discard clears pending state and hides capture immediately", () => {
   assert.match(body, /chrome\.storage\.local\.remove\("pendingCapture"\)/);
 });
 
-test("workspace supports multiple saved specifications", () => {
+test("project settings expose one focused page specification", () => {
   const source = fs.readFileSync("extension/panel.js", "utf8");
-  assert.match(source, /function defaultWorkspace/);
-  assert.match(source, /workspace\.specs/);
-  assert.match(source, /async function createSpec/);
+  const html = fs.readFileSync("extension/panel.html", "utf8");
+  assert.equal(html.includes('id="saved-pages"'), false);
+  assert.equal(html.includes('id="new-project"'), false);
+  assert.equal(html.includes('id="new-page"'), false);
+  assert.equal(source.includes("workspace.specs"), false);
+  assert.equal(source.includes("async function createSpec"), false);
+  assert.match(source, /await chrome\.storage\.local\.remove\("workspace"\)/);
 });
 
 test("project settings collapse into a persistent one-line summary", () => {
@@ -67,8 +71,8 @@ test("single-block mode copies structured agent data and optional PNG", () => {
 
 test("locale changes translate only system-managed project and page names", () => {
   const source = fs.readFileSync("extension/panel.js", "utf8");
-  assert.match(source, /state\.workspace\.specs\.forEach\(spec => localizeSystemLabels\(spec, locale\)\)/);
-  assert.match(source, /migrateSystemLabels\(spec, state\.locale/);
+  assert.match(source, /localizeSystemLabels\(state\.spec, locale\)/);
+  assert.match(source, /migrateSystemLabels\(legacySpec, state\.locale/);
   assert.match(source, /delete state\.spec\.pageLabelKey/);
   assert.match(source, /delete state\.spec\.projectLabelKey/);
 });
@@ -147,9 +151,16 @@ test("project folder selection is routed through the native host", () => {
 test("successful export displays and copies the Collector number", () => {
   const source = fs.readFileSync("extension/panel.js", "utf8");
   const html = fs.readFileSync("extension/panel.html", "utf8");
+  const exportHandler = source.slice(source.indexOf('$("#export").onclick'), source.indexOf("chrome.storage.onChanged.addListener"));
   assert.match(html, /id="export-result"/);
   assert.match(html, /id="collection-id"/);
   assert.match(html, /id="copy-collection-id"/);
   assert.match(source, /response\.collectionId/);
+  assert.match(source, /async function resetPageAfterExport/);
+  assert.match(source, /pageScreenshotIds\.forEach\(id => \{ delete state\.screenshots\[id\]; \}\)/);
+  assert.match(source, /state\.spec = defaultSpec\(\)/);
+  assert.match(source, /state\.workflowDrafts\.page = null/);
+  assert.match(source, /await resetPageAfterExport\(\)/);
+  assert.match(exportHandler, /if \(response\?\.ok\) \{[\s\S]*await resetPageAfterExport\(\);[\s\S]*\} else \{/);
   assert.match(source, /navigator\.clipboard\.writeText\(\$\("#collection-id"\)\.textContent\)/);
 });

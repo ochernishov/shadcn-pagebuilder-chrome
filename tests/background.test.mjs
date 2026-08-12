@@ -2,6 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 
+test("Chrome manifest version follows package.json", () => {
+  const manifest = fs.readFileSync("extension/manifest.template.json", "utf8");
+  const build = fs.readFileSync("scripts/build.mjs", "utf8");
+  assert.match(manifest, /"version": "__APP_VERSION__"/);
+  assert.match(build, /__APP_VERSION__: pkg\.version/);
+});
+
 test("runtime code never calls sidePanel.open", () => {
   const source = fs.readFileSync("extension/collector-worker.js", "utf8");
   assert.equal(source.includes("sidePanel.open"), false);

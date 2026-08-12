@@ -12,13 +12,14 @@ function env() {
   return result;
 }
 const values = env();
+const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
 const required = ["APP_NAME", "NATIVE_HOST_NAME", "EXTENSION_PUBLIC_KEY", "ALLOWED_HOST_PATTERN", "CAPTURE_HOST_PERMISSION", "DEFAULT_PROJECT", "DEFAULT_PAGE", "DEFAULT_ROUTE", "EXPORT_DIRECTORY", "CHROME_EXTENSIONS_URL", "CHROME_APP_NAME", "PROJECT_EXPORT_DIRECTORY", "COLLECTOR_SKILL_NAME", "CODEX_SKILLS_DIRECTORY", "CLAUDE_SKILLS_DIRECTORY"];
 for (const key of required) if (!values[key]) throw new Error(`Missing ${key} in .env`);
 const dist = path.join(root, "dist", "extension");
 fs.rmSync(dist, { recursive: true, force: true });
 fs.mkdirSync(path.join(dist, "icons"), { recursive: true });
 fs.mkdirSync(path.join(dist, "fonts"), { recursive: true });
-const tokens = Object.fromEntries(required.map(key => [`__${key}__`, values[key]]));
+const tokens = { ...Object.fromEntries(required.map(key => [`__${key}__`, values[key]])), __APP_VERSION__: pkg.version };
 for (const file of ["manifest.template.json", "config.template.js"]) {
   let content = fs.readFileSync(path.join(root, "extension", file), "utf8");
   for (const [token, value] of Object.entries(tokens)) content = content.replaceAll(token, value);

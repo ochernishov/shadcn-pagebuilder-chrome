@@ -13,6 +13,8 @@ Collect blocks and visual references from any website, arrange a page outline, a
 
 The extension separates visual research from implementation. **Page** mode saves source pages, selected text, notes, and screenshots into an ordered page specification. Clicking **Finish page** creates a package such as `Collector/482731/` inside the chosen project. **One block** mode prepares a standalone reference that can be pasted directly into Codex, Claude Code, or another coding agent without changing the page collection.
 
+![Shadcn Page Collector with Page and One block workflows](docs/screenshots/01-workflow-modes.jpg)
+
 ```text
 Chrome reference collection
         ↓
@@ -36,7 +38,7 @@ Codex or Claude Code implements the page
 - Reorder, remove, expand, preview, and reopen every saved item.
 - Edit and save implementation notes inside any expanded page item; updated notes flow into copied prompts, JSON, Markdown, and the next numbered export.
 - Detect duplicate source URLs and open the existing item instead of adding it twice.
-- Manage multiple projects and pages in one local workspace.
+- Keep one current page collection at a time, with no hidden project or page backlog inside the extension.
 - Select the real project directory with the native macOS folder picker.
 - Mark a page as **Create** or **Edit** and preserve its target route.
 - Collapse project settings into a compact summary of the project, page, route, and Create/Edit intent so the page-building workspace stays primary.
@@ -64,7 +66,7 @@ No library API key is required by Collector. Credentials remain in the user's au
 
 Requirements: macOS, Google Chrome, and [Node.js 20 or newer](https://nodejs.org/).
 
-1. Download `Shadcn-Page-Collector-v0.9.2.zip` from the latest GitHub Release.
+1. Download `Shadcn-Page-Collector-v0.10.0.zip` from the latest GitHub Release.
 2. Unzip the archive.
 3. Double-click **Install on macOS.command**. If macOS blocks it, Control-click the file, choose **Open**, and confirm once.
 4. Chrome opens `chrome://extensions`. Enable **Developer mode**.
@@ -105,6 +107,8 @@ The shortcut and the toolbar icon intentionally perform different actions:
 
 Chrome does not guarantee that a suggested shortcut is assigned when another extension already uses it or when a command changes during an update. If capture does not run:
 
+![Chrome keyboard shortcut settings for Shadcn Page Collector](<docs/screenshots/05-chrome-shortcut-settings - 2.jpg>)
+
 1. Paste `chrome://extensions/shortcuts` into the Chrome address bar.
 2. Find **Shadcn Page Collector**.
 3. Click the pencil beside **Capture the active page**.
@@ -126,13 +130,43 @@ Choose **Page** or **One block** directly below the application title. Switching
 ### Collect a page
 
 1. Open the collector and choose a project folder.
+
+The native macOS picker connects Collector to the real project directory where the numbered package will be written.
+
+![Choosing the project directory with the native macOS folder picker](docs/screenshots/03-project-folder-picker.jpg)
+
 2. Enter the page name, route, and **Create/Edit** intent.
+
+![Expanded project settings with folder, page route, and task](docs/screenshots/02-project-settings-expanded.jpg)
+
+Project settings collapse after setup, keeping the page actions and collected outline in focus.
+
+![Collapsed project settings and page capture actions](docs/screenshots/04-project-settings-collapsed.jpg)
+
 3. Open a block, component, or reference page.
 4. Click **Add current page**, press `⇧⌘K`, or use **Add to Shadcn Page Collector** in the context menu. All three prepare the active page without toggling the panel; click the extension icon whenever you need to open the panel.
 5. Choose the semantic section type, position, notes, and whether to include a screenshot; then click **Add block** or **Discard**.
+
+Collector stores the source URL and your implementation intent. A visible screenshot can travel with the reference, but no hidden library source is extracted.
+
+![Capturing a source block from a component library](docs/screenshots/07-source-capture.jpg)
+
 6. For an arbitrary visual fragment, click **Add screenshot**, drag a rectangle on the page, and release.
+
+The same workflow works on ordinary websites and galleries: select only the region the coding agent should treat as a visual reference.
+
+![Selecting an arbitrary page region as a screenshot reference](docs/screenshots/08-region-screenshot-selection.jpg)
+
 7. Expand items to inspect their source, edit and save implementation notes, review install metadata and screenshots, and reorder or remove items as needed. `Command+Enter` on macOS or `Ctrl+Enter` elsewhere also saves the notes field.
-8. Click **Finish page**, then copy the six-digit Collector number.
+
+The outline may mix source blocks and screenshot-only references. Notes remain editable until the page is finished.
+
+![Ordered page outline with editable implementation notes](docs/screenshots/09-page-outline-editing.jpg)
+
+8. Click **Finish page**. Collector first writes the numbered package, then clears the finished page, its draft, and its page screenshots. The successful export card remains visible so you can copy the six-digit Collector number.
+
+![Finished Collector package with its six-digit number and local path](docs/screenshots/11-finish-page.jpg)
+
 9. Open the same project in Codex or Claude Code and invoke the skill with that number.
 
 ### Capture one block
@@ -143,6 +177,8 @@ Choose **Page** or **One block** directly below the application title. Switching
 4. Choose the section type, add implementation notes, and optionally include the visible screenshot.
 5. Click **Prepare block**, review the source and preview, then click **Copy for agent**.
 6. Paste into Codex, Claude Code, or another coding agent. The clipboard always contains structured JSON and, where supported, the captured PNG as an additional clipboard representation.
+
+![Preparing one standalone block without changing the page collection](docs/screenshots/10-single-block-mode.jpg)
 
 ## Exported package
 
@@ -162,7 +198,7 @@ With a selected project directory:
 
 Without a selected directory, the configured fallback is `~/Documents/Page Collector/<project>/Collector/<number>/`.
 
-Every **Finish page** click creates a new collision-checked number. `Collector/.gitignore` ignores all generated packages by default so URLs, notes, local paths, and screenshots are not accidentally committed to the target project. Remove or change that local ignore file only when you deliberately want to version a sanitized collection.
+Every successful **Finish page** action creates a new collision-checked number and resets the page workspace only after the Native Host confirms that the package was written. A failed export leaves the collection untouched. `Collector/.gitignore` ignores all generated packages by default so URLs, notes, local paths, and screenshots are not accidentally committed to the target project. Remove or change that local ignore file only when you deliberately want to version a sanitized collection.
 
 ## Use with Codex or Claude Code
 
@@ -186,6 +222,10 @@ The skill:
 
 The canonical public skill is included at [`skills/shadcn-collector/`](skills/shadcn-collector/). It does not scan the home directory, sibling projects, credentials, or browser data.
 
+The agent resolves the exact six-digit package, reads its Markdown, JSON, and reference images, and then implements the result under the target project's own instructions.
+
+![A coding agent resolving a numbered Collector package](docs/screenshots/12-agent-skill.jpg)
+
 ## Languages
 
 English is the default. The bottom switcher supports:
@@ -200,113 +240,7 @@ English is the default. The bottom switcher supports:
 
 The selected locale controls every system label, status message, semantic section name, context-menu title, and exported Markdown instruction. Built-in placeholder names such as **Landing Page** also follow the locale. Names entered by the user and real folder names are intentionally preserved exactly as written.
 
-## Screenshots
-
-The final JPEG images are being prepared. The expandable gallery below defines the public sequence; exact capture instructions, recommended framing, and redaction rules are in [`docs/screenshots/README.md`](docs/screenshots/README.md). Image readiness is tracked in [`docs/screenshots/images.manifest.json`](docs/screenshots/images.manifest.json).
-
-<details open>
-<summary><strong>1. Choose a workflow</strong></summary>
-
-The Page and One block tabs directly below the application title.
-
-Planned file: `docs/screenshots/01-workflow-modes.jpg`
-</details>
-
-<details>
-<summary><strong>2. Configure a page project</strong></summary>
-
-Expanded project settings with saved pages, folder, page name, route, and Create/Edit intent.
-
-Planned file: `docs/screenshots/02-project-settings-expanded.jpg`
-</details>
-
-<details>
-<summary><strong>3. Choose a project folder</strong></summary>
-
-The native macOS folder picker opened for a neutral demo project.
-
-Planned file: `docs/screenshots/03-project-folder-picker.jpg`
-</details>
-
-<details>
-<summary><strong>4. Use compact project settings</strong></summary>
-
-Collapsed settings summary above the primary page-building workspace.
-
-Planned file: `docs/screenshots/04-project-settings-collapsed.jpg`
-</details>
-
-<details>
-<summary><strong>5. Configure the capture shortcut</strong></summary>
-
-Chrome's extension-shortcut page with the active-page capture command assigned.
-
-Planned file: `docs/screenshots/05-chrome-shortcut-settings.jpg`
-</details>
-
-<details>
-<summary><strong>6. Grant website access</strong></summary>
-
-Chrome's website-access permission shown for the explicit capture action.
-
-Planned file: `docs/screenshots/06-website-access-permission.jpg`
-</details>
-
-<details>
-<summary><strong>7. Capture a source block</strong></summary>
-
-A library detail page with the pending source card, type, position, notes, screenshot option, Discard, and Add block.
-
-Planned file: `docs/screenshots/07-source-capture.jpg`
-</details>
-
-<details>
-<summary><strong>8. Capture an arbitrary region</strong></summary>
-
-The rectangle selector on a normal website and the resulting cropped reference.
-
-Planned file: `docs/screenshots/08-region-screenshot-selection.jpg`
-</details>
-
-<details>
-<summary><strong>9. Arrange and revise a mixed page</strong></summary>
-
-An outline containing source blocks and visual-only references, including expanded editable implementation notes.
-
-Planned file: `docs/screenshots/09-page-outline-editing.jpg`
-</details>
-
-<details>
-<summary><strong>10. Prepare one standalone block</strong></summary>
-
-The One block result with source data, notes, optional preview, and Copy for agent.
-
-Planned file: `docs/screenshots/10-single-block-mode.jpg`
-</details>
-
-<details>
-<summary><strong>11. Finish and copy the Collector number</strong></summary>
-
-The successful export card with a demo six-digit ID and sanitized path.
-
-Planned file: `docs/screenshots/11-finish-page.jpg`
-</details>
-
-<details>
-<summary><strong>12. Hand off to a coding agent</strong></summary>
-
-Codex or Claude Code resolving the same number and summarizing the package.
-
-Planned file: `docs/screenshots/12-agent-skill.jpg`
-</details>
-
-<details>
-<summary><strong>13. Five complete interface languages</strong></summary>
-
-One contact sheet showing EN, RU, FR, IT, and 中文 with the same built-in values translated in every frame.
-
-Planned file: `docs/screenshots/13-languages.jpg`
-</details>
+![English, Russian, French, Italian, and Chinese interfaces](docs/screenshots/13-languages.jpg)
 
 ## What is public and what stays local
 
@@ -326,7 +260,7 @@ The extension has no analytics, remote backend, advertising, or account system. 
 |---|---|
 | `activeTab` | Temporary access after an explicit user action |
 | `scripting` | Inject and remove the rectangle-selection overlay |
-| `storage`, `unlimitedStorage` | Store workspace data and explicitly captured PNGs locally |
+| `storage`, `unlimitedStorage` | Store the current working page, standalone block, and explicitly captured PNGs locally |
 | `sidePanel` | Show the Collector interface |
 | `nativeMessaging` | Choose a macOS folder and write the finished local package |
 | `contextMenus`, `commands` | User-initiated capture actions |

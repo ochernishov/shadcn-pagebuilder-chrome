@@ -4,120 +4,111 @@
   "slots": {
     "01-workflow-modes.jpg": {
       "page": "README",
-      "section": "Screenshots / Workflow",
-      "desc": "Page and One block workflow tabs below the extension title",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "What it does",
+      "desc": "Page and One block workflows",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "1222x1034"
     },
     "02-project-settings-expanded.jpg": {
       "page": "README",
-      "section": "Screenshots / Project setup",
-      "desc": "Expanded project settings with saved pages, folder, route, and task",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "Project setup",
+      "desc": "Expanded settings containing a personal filesystem path",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "1220x968"
     },
     "03-project-folder-picker.jpg": {
       "page": "README",
-      "section": "Screenshots / Project setup",
-      "desc": "Sanitized native macOS project-folder picker",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "Project setup",
+      "desc": "Folder picker containing personal folders and a filesystem path",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "1962x1986"
     },
     "04-project-settings-collapsed.jpg": {
       "page": "README",
-      "section": "Screenshots / Project setup",
-      "desc": "Collapsed project summary above the primary page actions",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "Usage / Collect a page",
+      "desc": "Collapsed project settings and page capture actions",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "1236x1870"
     },
-    "05-chrome-shortcut-settings.jpg": {
+    "05-chrome-shortcut-settings - 2.jpg": {
       "page": "README",
-      "section": "Screenshots / Chrome setup",
-      "desc": "Chrome extension shortcut settings for active-page capture",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
-    },
-    "06-website-access-permission.jpg": {
-      "page": "README",
-      "section": "Screenshots / Chrome setup",
-      "desc": "Chrome website-access permission requested by an explicit capture action",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "Install on macOS / Keyboard shortcut",
+      "desc": "Chrome shortcut assigned to active-page capture",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "2548x694"
     },
     "07-source-capture.jpg": {
       "page": "README",
-      "section": "Screenshots / Page collection",
-      "desc": "Source-library page with a complete pending block form",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "Usage / Collect a page",
+      "desc": "Source-library page with a pending block form",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "3582x1974"
     },
     "08-region-screenshot-selection.jpg": {
       "page": "README",
-      "section": "Screenshots / Page collection",
-      "desc": "Rectangle-selection overlay for an arbitrary visual reference",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "Usage / Collect a page",
+      "desc": "Rectangle selection for an arbitrary visual reference",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "3760x2781"
     },
     "09-page-outline-editing.jpg": {
       "page": "README",
-      "section": "Screenshots / Page collection",
-      "desc": "Mixed ordered page outline with expanded editable notes",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "Usage / Collect a page",
+      "desc": "Ordered outline with editable implementation notes",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "3752x2776"
     },
     "10-single-block-mode.jpg": {
       "page": "README",
-      "section": "Screenshots / One block",
-      "desc": "Prepared standalone block and Copy for agent action",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "Usage / Capture one block",
+      "desc": "Standalone block preparation workflow",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "3584x1868"
     },
     "11-finish-page.jpg": {
       "page": "README",
-      "section": "Screenshots / Export",
-      "desc": "Successful numbered Collector export with a sanitized path",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "Exported package",
+      "desc": "Finished package card containing a personal filesystem path",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "1234x584"
     },
     "12-agent-skill.jpg": {
       "page": "README",
-      "section": "Screenshots / Agent handoff",
-      "desc": "Codex or Claude Code resolving Collector 482731 in the demo project",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "1600px+ wide, 16:10 or 16:9"
+      "section": "Use with Codex or Claude Code",
+      "desc": "Coding agent resolving a numbered Collector package",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "2328x2354"
     },
     "13-languages.jpg": {
       "page": "README",
-      "section": "Screenshots / Localization",
-      "desc": "Contact sheet of EN, RU, FR, IT, and ZH interfaces",
-      "status": "missing",
-      "used_in": ["README.md", "docs/screenshots/README.md"],
-      "source": "user capture pending",
-      "size": "2000px+ wide contact sheet"
+      "section": "Languages",
+      "desc": "English, Russian, French, Italian, and Chinese interfaces",
+      "status": "final",
+      "used_in": ["README.md"],
+      "source": "user capture, 2026-08-12",
+      "size": "3456x2234"
     }
   }
 }

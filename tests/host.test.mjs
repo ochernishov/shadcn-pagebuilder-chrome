@@ -39,6 +39,19 @@ test("native host exports screenshot references as PNG files", () => {
   assert.ok(fs.statSync(path.join(directory, "Test", "Collector", response.collectionId, "references", "01-hero1.png")).size > 0);
 });
 
+test("native host reads messages larger than one pipe chunk", () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "collector-large-message-"));
+  const largePng = `data:image/png;base64,${Buffer.alloc(120000, 65).toString("base64")}`;
+  const spec = { project: "Large", page: "Home", blocks: [] };
+  const message = Buffer.from(JSON.stringify({ action: "export", spec, markdown: "# Large\n\nLine with a tab\tand Unicode: 页面", screenshots: { unused: largePng } }));
+  assert.ok(message.length > 65536);
+  const length = Buffer.alloc(4); length.writeUInt32LE(message.length);
+  const result = spawnSync(process.execPath, ["native-host/host.mjs"], { input: Buffer.concat([length, message]), env: { ...process.env, PAGE_COLLECTOR_EXPORT_DIRECTORY: directory, PAGE_COLLECTOR_PROJECT_EXPORT_DIRECTORY: "Collector" } });
+  const response = responseFrom(result);
+  assert.equal(response.ok, true);
+  assert.ok(fs.existsSync(path.join(response.directory, "PAGE_SPEC.md")));
+});
+
 test("native host exports into the selected project directory", () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "page-collector-project-"));
   const spec = { project: "Ignored", projectDirectory: directory, page: "Settings", blocks: [] };

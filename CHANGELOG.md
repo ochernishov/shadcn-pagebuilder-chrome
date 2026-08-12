@@ -6,6 +6,25 @@
 
 - Replaced the obsolete seven-PNG screenshot brief with 13 named JPEG slots covering workflow selection, project and Chrome setup, both capture modes, page editing, export, agent handoff, and localization.
 - Added a screenshot manifest that tracks every public image slot, its intended use, target framing, and readiness without committing private captures or placeholders.
+- Translated the screenshot-production brief into Russian while preserving all public JPEG filenames in English.
+- Replaced the standalone screenshot gallery with real images embedded alongside installation, collection, editing, agent handoff, and localization instructions.
+
+## [0.10.0] — 2026-08-12
+
+### Changed
+
+- Simplified project settings to one current page collection: folder, page name, target route, and Create/Edit intent.
+- A successful **Finish page** now preserves the exported Collector number while clearing the finished blocks, page draft, page screenshots, and page settings. Failed exports leave all working data untouched.
+- Legacy multi-page workspace state migrates to its active specification and is then removed from browser storage.
+- Chrome's generated manifest now reads the release version from `package.json`, preventing extension and ZIP version drift.
+
+### Removed
+
+- Removed **Saved pages**, **+ Project**, and **+ Page**, which duplicated folder selection and allowed unfinished browser workspaces to accumulate.
+
+### Fixed
+
+- Native Messaging now reads and writes complete length-prefixed payloads across multiple pipe chunks, preventing large page exports from failing near the 64 KiB boundary with a JSON control-character error.
 
 ## [0.9.2] — 2026-08-12
 
