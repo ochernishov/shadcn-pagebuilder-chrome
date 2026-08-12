@@ -11,7 +11,7 @@ Collect blocks and visual references from any website, arrange a page outline, a
 
 ## What it does
 
-The extension separates visual research from implementation. While browsing component libraries, galleries, or ordinary websites, you can save source pages, selected text, notes, and screenshots into an ordered page specification. Clicking **Finish page** creates a package such as `Collector/482731/` inside the chosen project. The included `shadcn-collector` skill lets a coding agent open that exact package by number and implement it.
+The extension separates visual research from implementation. **Page** mode saves source pages, selected text, notes, and screenshots into an ordered page specification. Clicking **Finish page** creates a package such as `Collector/482731/` inside the chosen project. **One block** mode prepares a standalone reference that can be pasted directly into Codex, Claude Code, or another coding agent without changing the page collection.
 
 ```text
 Chrome reference collection
@@ -25,16 +25,21 @@ Codex or Claude Code implements the page
 
 ## Features
 
-- Capture a source page from any HTTP or HTTPS website with `⇧⌘K` on macOS, `Alt+Shift+B` elsewhere, the extension icon, or the context menu.
+- Capture a source page from any HTTP or HTTPS website with `⇧⌘K` on macOS, `Alt+Shift+B` elsewhere, or the context menu. The shortcut captures the active page without opening or closing the side panel; use the extension icon to open the panel.
+- Switch between independent **Page** and **One block** workflows without losing the collected page or either unfinished capture draft.
+- Prepare one standalone block as structured JSON for a coding agent; when a screenshot is included, Collector also writes its PNG representation to the clipboard where supported.
 - Add an optional visible-tab screenshot to a captured source.
-- Click **+ Screenshot**, drag over any visible area, and add the cropped PNG as its own ordered visual reference.
+- Click **Add screenshot**, drag over any visible area, and add the cropped PNG as its own ordered visual reference.
+- Use the two explicit actions below the page name to add the current source page or capture a selected screenshot region.
 - Store source URL, title, hostname, selected text, semantic section type, position, and implementation notes.
 - Mix installable blocks and screenshot-only references in the same page.
 - Reorder, remove, expand, preview, and reopen every saved item.
+- Edit and save implementation notes inside any expanded page item; updated notes flow into copied prompts, JSON, Markdown, and the next numbered export.
 - Detect duplicate source URLs and open the existing item instead of adding it twice.
 - Manage multiple projects and pages in one local workspace.
 - Select the real project directory with the native macOS folder picker.
 - Mark a page as **Create** or **Edit** and preserve its target route.
+- Collapse project settings into a compact summary of the project, page, route, and Create/Edit intent so the page-building workspace stays primary.
 - Export `PAGE_SPEC.md`, `page-spec.json`, and PNG references into an isolated six-digit package.
 - Install the shared `shadcn-collector` skill for both Codex and Claude Code.
 - Use the complete interface and exported instructions in English, Russian, French, Italian, or Chinese.
@@ -59,12 +64,14 @@ No library API key is required by Collector. Credentials remain in the user's au
 
 Requirements: macOS, Google Chrome, and [Node.js 20 or newer](https://nodejs.org/).
 
-1. Download `Shadcn-Page-Collector-v0.8.0.zip` from the latest GitHub Release.
+1. Download `Shadcn-Page-Collector-v0.9.1.zip` from the latest GitHub Release.
 2. Unzip the archive.
 3. Double-click **Install on macOS.command**. If macOS blocks it, Control-click the file, choose **Open**, and confirm once.
 4. Chrome opens `chrome://extensions`. Enable **Developer mode**.
 5. Click **Load unpacked** and select the `extension` folder inside the unzipped archive.
-6. Pin the extension if desired, then restart Codex or Claude Code once so it discovers the installed skill.
+6. Open `chrome://extensions/shortcuts`, find **Shadcn Page Collector — Capture the active page**, and verify its shortcut. On macOS, click the pencil and press `Command+Shift+K` if the field is empty.
+7. On the first **Add current page** or **Add screenshot** click, accept Chrome's website-access request. Collector needs it to reach the tab from the side panel.
+8. Pin the extension if desired, then restart Codex or Claude Code once so it discovers the installed skill.
 
 The installer copies the Native Messaging host into `~/Library/Application Support/Shadcn Page Collector/` and installs the same public skill into `~/.codex/skills/shadcn-collector/` and `~/.claude/skills/shadcn-collector/`. The downloaded archive may be removed after Chrome has loaded the extension.
 
@@ -81,11 +88,30 @@ npm run setup
 
 Then open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select `dist/extension`.
 
+Open `chrome://extensions/shortcuts` and verify that **Capture the active page** is assigned to `Command+Shift+K` on macOS or `Alt+Shift+B` on other platforms.
+
 The public SPKI key in `.env.example` only keeps the unpacked extension ID stable. It is intentionally public and is not a credential.
 
 ### Update or remove
 
-For an update, replace the release folder, run **Install on macOS.command** again, and click **Reload** on the extension card in `chrome://extensions`.
+For an update, replace the release folder, run **Install on macOS.command** again, and click **Reload** on the extension card in `chrome://extensions`. Then check `chrome://extensions/shortcuts`: Chrome may leave a renamed or conflicting extension command unassigned instead of transferring the old shortcut.
+
+### Keyboard shortcut
+
+The shortcut and the toolbar icon intentionally perform different actions:
+
+- `Command+Shift+K` on macOS (`Alt+Shift+B` elsewhere) captures the active page without opening or closing the side panel.
+- The toolbar icon opens or closes the side panel.
+
+Chrome does not guarantee that a suggested shortcut is assigned when another extension already uses it or when a command changes during an update. If capture does not run:
+
+1. Paste `chrome://extensions/shortcuts` into the Chrome address bar.
+2. Find **Shadcn Page Collector**.
+3. Click the pencil beside **Capture the active page**.
+4. Press `Command+Shift+K`, or choose another free combination if Chrome reports a conflict.
+5. Test the command on a normal HTTP/HTTPS page, not on an internal `chrome://` page.
+
+The **Add current page** button below the page name always provides the same capture action without a keyboard shortcut.
 
 To remove Collector completely:
 
@@ -95,15 +121,28 @@ To remove Collector completely:
 
 ## Usage
 
+Choose **Page** or **One block** directly below the application title. Switching modes preserves the page outline, the standalone result, and unfinished drafts independently.
+
+### Collect a page
+
 1. Open the collector and choose a project folder.
 2. Enter the page name, route, and **Create/Edit** intent.
 3. Open a block, component, or reference page.
-4. Press `⇧⌘K`, click the extension icon, or use **Add to Shadcn Page Collector** in the context menu.
+4. Click **Add current page**, press `⇧⌘K`, or use **Add to Shadcn Page Collector** in the context menu. All three prepare the active page without toggling the panel; click the extension icon whenever you need to open the panel.
 5. Choose the semantic section type, position, notes, and whether to include a screenshot; then click **Add block** or **Discard**.
-6. For an arbitrary visual fragment, click **+ Screenshot**, drag a rectangle on the page, and release.
-7. Expand items to inspect their source, notes, install metadata, and screenshot. Reorder or remove them as needed.
+6. For an arbitrary visual fragment, click **Add screenshot**, drag a rectangle on the page, and release.
+7. Expand items to inspect their source, edit and save implementation notes, review install metadata and screenshots, and reorder or remove items as needed. `Command+Enter` on macOS or `Ctrl+Enter` elsewhere also saves the notes field.
 8. Click **Finish page**, then copy the six-digit Collector number.
 9. Open the same project in Codex or Claude Code and invoke the skill with that number.
+
+### Capture one block
+
+1. Switch to **One block**. No project folder is required.
+2. Open a component or block on any HTTP/HTTPS page.
+3. Click **Capture current block**, press the configured shortcut, or use the context menu.
+4. Choose the section type, add implementation notes, and optionally include the visible screenshot.
+5. Click **Prepare block**, review the source and preview, then click **Copy for agent**.
+6. Paste into Codex, Claude Code, or another coding agent. The clipboard always contains structured JSON and, where supported, the captured PNG as an additional clipboard representation.
 
 ## Exported package
 
@@ -244,7 +283,9 @@ The extension has no analytics, remote backend, advertising, or account system. 
 | `nativeMessaging` | Choose a macOS folder and write the finished local package |
 | `contextMenus`, `commands` | User-initiated capture actions |
 
-The manifest has no persistent `host_permissions`. Source websites continue to make their own normal browser requests; Collector does not add network requests or upload collected data.
+The manifest has no required `host_permissions`. The configured HTTP/HTTPS pattern is declared as an optional host permission. Chrome asks for it only after the user explicitly clicks **Add current page** or **Add screenshot** in the side panel; the capture cannot run if the request is declined. The keyboard shortcut and context menu continue to use temporary `activeTab` access. The granted optional access can be revoked in Chrome's extension settings at any time.
+
+Source websites continue to make their own normal browser requests; Collector does not add network requests or upload collected data.
 
 ## Configuration and development
 

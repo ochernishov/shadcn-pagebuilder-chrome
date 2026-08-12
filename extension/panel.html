@@ -10,16 +10,26 @@
   <main class="shell">
     <header class="masthead">
       <div class="mark">PC</div>
-      <div><p class="eyebrow" data-i18n="designIntent"></p><h1 id="app-title"></h1></div>
-      <button type="button" id="settings-toggle" class="icon-button" data-i18n-title="projectSettings">⋯</button>
+      <div><p id="app-eyebrow" class="eyebrow" data-i18n="designIntent"></p><h1 id="app-title"></h1></div>
     </header>
 
-    <section id="settings" class="settings">
-      <label><span data-i18n="savedPages"></span><select id="saved-pages"></select></label>
-      <div class="workspace-actions"><button type="button" id="new-project" class="secondary" data-i18n="newProject"></button><button type="button" id="new-page" class="secondary" data-i18n="newPage"></button></div>
-      <div class="folder-picker"><div><span data-i18n="projectFolder"></span><strong id="project-folder"></strong></div><button type="button" id="choose-folder" class="secondary" data-i18n="chooseFolder"></button></div>
-      <label><span data-i18n="page"></span><input id="page" autocomplete="off"></label>
-      <div class="grid"><label><span data-i18n="targetRoute"></span><input id="route" autocomplete="off"></label><label><span data-i18n="pageMode"></span><select id="page-mode"></select></label></div>
+    <nav class="workflow-tabs" role="tablist" data-i18n-aria-label="workflowMode">
+      <button type="button" id="page-mode-tab" role="tab" aria-selected="true" aria-controls="page-workspace" data-workflow-mode="page" data-i18n="pageWorkflow"></button>
+      <button type="button" id="single-mode-tab" role="tab" aria-selected="false" aria-controls="single-workspace" data-workflow-mode="single" data-i18n="singleWorkflow"></button>
+    </nav>
+
+    <section id="settings" class="settings page-workflow" aria-expanded="true">
+      <button type="button" id="settings-toggle" class="settings-summary" aria-expanded="true" aria-controls="settings-fields">
+        <span class="settings-summary-copy"><span data-i18n="projectSettings"></span><strong id="settings-summary-title"></strong><small id="settings-summary-meta"></small></span>
+        <span class="settings-chevron" aria-hidden="true">⌃</span>
+      </button>
+      <div id="settings-fields" class="settings-fields">
+        <label><span data-i18n="savedPages"></span><select id="saved-pages"></select></label>
+        <div class="workspace-actions"><button type="button" id="new-project" class="secondary" data-i18n="newProject"></button><button type="button" id="new-page" class="secondary" data-i18n="newPage"></button></div>
+        <div class="folder-picker"><div><span data-i18n="projectFolder"></span><strong id="project-folder"></strong></div><button type="button" id="choose-folder" class="secondary" data-i18n="chooseFolder"></button></div>
+        <label><span data-i18n="page"></span><input id="page" autocomplete="off"></label>
+        <div class="grid"><label><span data-i18n="targetRoute"></span><input id="route" autocomplete="off"></label><label><span data-i18n="pageMode"></span><select id="page-mode"></select></label></div>
+      </div>
     </section>
 
     <section id="capture" class="capture" hidden>
@@ -28,20 +38,44 @@
       <p id="capture-registry" class="registry"></p>
       <div class="grid">
         <label><span data-i18n="sectionType"></span><select id="block-type"></select></label>
-        <label><span data-i18n="position"></span><input id="position" type="number" min="1"></label>
+        <label id="capture-position-field"><span data-i18n="position"></span><input id="position" type="number" min="1"></label>
       </div>
       <label><span data-i18n="implementationNotes"></span><textarea id="instructions" rows="5" data-i18n-placeholder="notesPlaceholder"></textarea></label>
       <label class="screenshot-option"><input id="include-screenshot" type="checkbox" checked><span><strong data-i18n="includeScreenshot"></strong><small data-i18n="screenshotHint"></small></span></label>
       <div class="actions"><button type="button" id="discard" class="secondary" data-i18n="discard"></button><button type="button" id="add" data-i18n="addBlock"></button></div>
     </section>
 
-    <section class="collection">
+    <section id="page-workspace" class="collection page-workflow" role="tabpanel" aria-labelledby="page-mode-tab">
       <div class="section-heading">
-        <div><p class="eyebrow" data-i18n="currentPage"></p><h2 id="page-title"></h2></div>
-        <div class="collection-tools"><button type="button" id="add-screenshot" class="secondary capture-region"><span aria-hidden="true">＋</span><span data-i18n="addScreenshot"></span></button><span id="count" class="count">0</span></div>
+        <h2 id="page-title"></h2>
+      </div>
+      <div class="collection-actions">
+        <button type="button" id="add-current-page" class="secondary capture-region"><span aria-hidden="true">＋</span><span data-i18n="addCurrentPage"></span></button>
+        <button type="button" id="add-screenshot" class="secondary capture-region"><span aria-hidden="true">⌗</span><span data-i18n="addScreenshot"></span></button>
       </div>
       <ol id="blocks" class="blocks"></ol>
       <div id="empty" class="empty"><span>⇧⌘K</span><p data-i18n="emptyHint"></p></div>
+    </section>
+
+    <section id="single-workspace" class="single-workflow" role="tabpanel" aria-labelledby="single-mode-tab" hidden>
+      <div id="single-empty" class="single-empty">
+        <p class="eyebrow" data-i18n="singleBlock"></p>
+        <h2 data-i18n="singleEmptyTitle"></h2>
+        <p data-i18n="singleEmptyHint"></p>
+        <button type="button" id="single-capture" class="secondary capture-region"><span aria-hidden="true">＋</span><span data-i18n="captureSingleBlock"></span></button>
+      </div>
+      <article id="single-result" class="single-result" hidden>
+        <p class="eyebrow" data-i18n="singleReady"></p>
+        <h2 id="single-title"></h2>
+        <p id="single-domain" class="registry"></p>
+        <dl class="single-details">
+          <div><dt data-i18n="sectionType"></dt><dd id="single-type"></dd></div>
+          <div><dt data-i18n="source"></dt><dd><a id="single-source" target="_blank" rel="noreferrer"></a></dd></div>
+          <div id="single-notes-row"><dt data-i18n="notesLabel"></dt><dd id="single-notes"></dd></div>
+        </dl>
+        <div id="single-preview-slot"></div>
+        <div class="actions"><button type="button" id="clear-single" class="secondary" data-i18n="clearSingle"></button><button type="button" id="copy-single" data-i18n="copySingle"></button></div>
+      </article>
     </section>
 
     <footer>
@@ -50,7 +84,7 @@
         <div><span data-i18n="collectorReady"></span><strong id="collection-id"></strong><small id="collection-path"></small></div>
         <button type="button" id="copy-collection-id" class="secondary" data-i18n="copyNumber"></button>
       </section>
-      <div class="actions"><button type="button" id="copy" class="secondary" data-i18n="copyPrompt"></button><button type="button" id="export" data-i18n="finishPage"></button></div>
+      <div class="actions page-workflow"><button type="button" id="copy" class="secondary" data-i18n="copyPrompt"></button><button type="button" id="export" data-i18n="finishPage"></button></div>
       <nav id="language-switcher" class="language-switcher" data-i18n-aria-label="languageSwitcher"></nav>
     </footer>
   </main>

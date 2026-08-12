@@ -1,15 +1,17 @@
 {
   "manifest_version": 3,
   "name": "__APP_NAME__",
-  "version": "0.8.0",
+  "version": "0.9.1",
   "key": "__EXTENSION_PUBLIC_KEY__",
   "description": "Collect web references and selected screenshots into implementation-ready page specifications.",
   "permissions": ["activeTab", "contextMenus", "storage", "unlimitedStorage", "sidePanel", "nativeMessaging", "commands", "scripting"],
+  "optional_host_permissions": ["__ALLOWED_HOST_PATTERN__"],
   "background": { "service_worker": "collector-worker.js", "type": "module" },
   "action": { "default_title": "Open __APP_NAME__" },
   "side_panel": { "default_path": "panel.html" },
   "commands": {
-    "_execute_action": {
+    "capture-block": {
+      "description": "Capture the active page in Shadcn Page Collector",
       "suggested_key": { "default": "Alt+Shift+B", "mac": "Command+Shift+K" }
     }
   },
