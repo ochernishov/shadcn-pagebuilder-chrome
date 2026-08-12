@@ -2,12 +2,12 @@ import { DEFAULT_LOCALE, LOCALES, MESSAGES, translate } from "./i18n.js";
 
 const TYPE_KEYS = ["hero", "navigation", "dashboard", "applicationShell", "dataTable", "logos", "features", "content", "steps", "cta", "pricing", "testimonials", "faq", "footer", "other"];
 const $ = selector => document.querySelector(selector);
-const state = { spec: null, pending: null, locale: DEFAULT_LOCALE, workspace: null, expandedBlockId: null };
+const state = { spec: null, pending: null, locale: DEFAULT_LOCALE, workspace: null, expandedBlockId: null, screenshots: {} };
 const t = key => translate(state.locale, key);
 const safeFileName = value => String(value || "block").normalize("NFKD").replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || "block";
 
 function defaultSpec() {
-  return { id: crypto.randomUUID(), version: 2, project: APP_CONFIG.defaultProject, projectDirectory: "", page: APP_CONFIG.defaultPage, pageMode: "create", route: APP_CONFIG.defaultRoute, framework: "Next.js", ui: "shadcn/ui", blocks: [] };
+  return { id: crypto.randomUUID(), version: 3, project: APP_CONFIG.defaultProject, projectDirectory: "", page: APP_CONFIG.defaultPage, pageMode: "create", route: APP_CONFIG.defaultRoute, framework: "Next.js", ui: "shadcn/ui", blocks: [] };
 }
 
 function defaultWorkspace(spec) { return { version: 1, activeSpecId: spec.id, specs: [spec] }; }
@@ -67,7 +67,7 @@ async function setLocale(locale) {
 }
 
 async function hydrate() {
-  const stored = await chrome.storage.local.get(["pageSpec", "workspace", "pendingCapture", "locale"]);
+  const stored = await chrome.storage.local.get(["pageSpec", "workspace", "pendingCapture", "locale", "screenshots"]);
   state.locale = MESSAGES[stored.locale] ? stored.locale : DEFAULT_LOCALE;
   const legacySpec = stored.pageSpec || defaultSpec();
   if (!legacySpec.id) legacySpec.id = crypto.randomUUID();
@@ -75,10 +75,11 @@ async function hydrate() {
   state.spec = state.workspace.specs.find(spec => spec.id === state.workspace.activeSpecId) || state.workspace.specs[0];
   state.spec.projectDirectory ||= "";
   state.spec.pageMode ||= "create";
-  state.spec.version = 2;
-  state.spec.blocks = state.spec.blocks.map(block => ({ ...block, typeKey: normalizeTypeKey(block) }));
+  state.spec.version = 3;
+  state.spec.blocks = state.spec.blocks.map(block => ({ ...block, kind: block.kind || "source", typeKey: normalizeTypeKey(block) }));
+  state.screenshots = stored.screenshots || {};
   state.pending = stored.pendingCapture || null;
-  const existing = state.pending && state.spec.blocks.find(block => block.url === state.pending.url);
+  const existing = state.pending && state.spec.blocks.find(block => block.kind !== "visual-reference" && block.url === state.pending.url);
   if (existing) {
     state.expandedBlockId = existing.id;
     state.pending = null;
@@ -99,12 +100,17 @@ function markdown(spec) {
   const sections = spec.blocks.map((block, index) => {
     const screenshotPath = block.screenshotId ? `references/${String(index + 1).padStart(2, "0")}-${safeFileName(block.slug)}.png` : null;
     const reference = screenshotPath ? `\n\n${t("visualReference")}: \`${screenshotPath}\`` : "";
-    return `## ${String(index + 1).padStart(2, "0")} — ${messages.types[normalizeTypeKey(block)]}\n\n${t("source")}: ${block.url}${reference}\n\nRegistry: \`${block.registry}\`\n\n${t("install")}: \`${block.installCommand}\`\n\n${t("changes")}:\n${block.instructions || t("fallbackChange")}`;
+    const heading = block.kind === "visual-reference" ? t("visualReferenceItem") : messages.types[normalizeTypeKey(block)];
+    const registry = block.registry ? `\n\n${t("registryLabel")}: \`${block.registry}\`` : "";
+    const install = block.installCommand ? `\n\n${t("install")}: \`${block.installCommand}\`` : "";
+    const selectedText = block.selectionText ? `\n\n${t("capturedText")}:\n> ${block.selectionText.replaceAll("\n", "\n> ")}` : "";
+    const fallback = block.kind === "visual-reference" ? t("visualReferenceFallback") : t("fallbackChange");
+    return `## ${String(index + 1).padStart(2, "0")} — ${heading}\n\n${t("source")}: ${block.url}${reference}${registry}${install}${selectedText}\n\n${t("changes")}:\n${block.instructions || fallback}`;
   }).join("\n\n---\n\n");
   const steps = t("agentSteps").map((step, index) => `${index + 1}. ${step}`).join("\n");
   const projectDirectory = spec.projectDirectory ? `\n${t("projectFolder")}: ${spec.projectDirectory}` : "";
   const pageMode = t(spec.pageMode === "edit" ? "editPage" : "createPage");
-  return `# ${t("specTitle")}\n\n${t("project")}: ${spec.project}${projectDirectory}\n${t("page")}: ${spec.page}\n${t("pageMode")}: ${pageMode}\n${t("targetRoute")}: ${spec.route}\n${t("framework")}: ${spec.framework}\nUI: ${spec.ui}\n${t("sourceLibrary")}: Shadcn Blocks\n\n## ${t("generalInstructions")}\n\n${t("generalText")}\n\n---\n\n${sections}\n\n## ${t("agentInstructions")}\n\n${steps}\n`;
+  return `# ${t("specTitle")}\n\n${t("project")}: ${spec.project}${projectDirectory}\n${t("page")}: ${spec.page}\n${t("pageMode")}: ${pageMode}\n${t("targetRoute")}: ${spec.route}\n${t("framework")}: ${spec.framework}\nUI: ${spec.ui}\n\n## ${t("generalInstructions")}\n\n${t("generalText")}\n\n---\n\n${sections}\n\n## ${t("agentInstructions")}\n\n${steps}\n`;
 }
 
 async function persist() {
@@ -172,15 +178,26 @@ function render() {
     const expanded = state.expandedBlockId === block.id;
     li.setAttribute("aria-expanded", String(expanded));
     li.innerHTML = `<div class="block-summary"><span class="block-order">${String(index + 1).padStart(2, "0")}</span><div class="block-copy"><strong></strong><small></small></div><button type="button">↑</button><button type="button">↓</button><button type="button">×</button><button type="button" class="block-toggle">⌄</button></div><div class="block-details" ${expanded ? "" : "hidden"}><a target="_blank" rel="noreferrer"></a><span class="detail-registry"></span><code class="detail-install"></code><p class="detail-notes"></p><span class="detail-screenshot"></span></div>`;
-    li.querySelector("strong").textContent = MESSAGES[state.locale].types[normalizeTypeKey(block)];
-    li.querySelector("small").textContent = `${block.slug}${block.screenshotId ? " · 📷" : ""}`;
+    li.querySelector("strong").textContent = block.kind === "visual-reference" ? t("visualReferenceItem") : MESSAGES[state.locale].types[normalizeTypeKey(block)];
+    li.querySelector("small").textContent = `${block.sourceDomain || block.slug}${block.screenshotId ? " · 📷" : ""}`;
     const link = li.querySelector("a");
     link.href = block.url;
     link.textContent = `${t("openSource")} ↗`;
-    li.querySelector(".detail-registry").textContent = `${t("registryLabel")}: ${block.registry}`;
-    li.querySelector(".detail-install").textContent = block.installCommand;
+    const registry = li.querySelector(".detail-registry");
+    registry.textContent = block.registry ? `${t("registryLabel")}: ${block.registry}` : "";
+    registry.hidden = !block.registry;
+    const install = li.querySelector(".detail-install");
+    install.textContent = block.installCommand || "";
+    install.hidden = !block.installCommand;
     li.querySelector(".detail-notes").textContent = block.instructions ? `${t("notesLabel")}: ${block.instructions}` : "";
     li.querySelector(".detail-screenshot").textContent = block.screenshotId ? `✓ ${t("screenshotIncluded")}` : "";
+    if (block.screenshotId && state.screenshots[block.screenshotId]) {
+      const preview = document.createElement("img");
+      preview.className = "block-preview";
+      preview.src = state.screenshots[block.screenshotId];
+      preview.alt = t("screenshotPreviewAlt");
+      li.querySelector(".block-details").append(preview);
+    }
     const buttons = li.querySelectorAll("button");
     [[buttons[0], "moveUp"], [buttons[1], "moveDown"], [buttons[2], "removeBlock"]].forEach(([button, key]) => { button.title = t(key); button.setAttribute("aria-label", t(key)); });
     buttons[0].onclick = event => { event.stopPropagation(); void move(index, -1); };
@@ -196,7 +213,7 @@ function render() {
   renderTypeOptions(selectedType);
   if (state.pending) {
     $("#capture-title").textContent = state.pending.title;
-    $("#capture-registry").textContent = state.pending.registry;
+    $("#capture-registry").textContent = state.pending.sourceDomain || state.pending.registry || "";
     $("#position").value = state.spec.blocks.length + 1;
     if ($("#block-type").dataset.captureId !== state.pending.id) {
       $("#instructions").value = state.pending.selectionText || "";
@@ -215,11 +232,76 @@ async function move(index, delta) {
 async function remove(index) {
   const [block] = state.spec.blocks.splice(index, 1);
   if (block?.screenshotId) {
-    const { screenshots = {} } = await chrome.storage.local.get("screenshots");
-    delete screenshots[block.screenshotId];
-    await chrome.storage.local.set({ screenshots });
+    delete state.screenshots[block.screenshotId];
+    await chrome.storage.local.set({ screenshots: state.screenshots });
   }
   await persist();
+}
+
+async function cropScreenshot(dataUrl, rect, viewport) {
+  const image = new Image();
+  image.src = dataUrl;
+  await image.decode();
+  const scaleX = image.naturalWidth / viewport.width;
+  const scaleY = image.naturalHeight / viewport.height;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(rect.width * scaleX));
+  canvas.height = Math.max(1, Math.round(rect.height * scaleY));
+  const context = canvas.getContext("2d");
+  context.drawImage(
+    image,
+    Math.round(rect.left * scaleX),
+    Math.round(rect.top * scaleY),
+    canvas.width,
+    canvas.height,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+  return canvas.toDataURL("image/png");
+}
+
+async function addVisualReference() {
+  const button = $("#add-screenshot");
+  button.disabled = true;
+  status(t("selectRegionStatus"));
+  try {
+    const response = await chrome.runtime.sendMessage({
+      type: "capture-selected-region",
+      labels: { hint: t("regionSelectionHint"), cancel: t("regionSelectionCancel") }
+    });
+    if (response?.canceled) return status(t("regionSelectionCanceled"));
+    if (!response?.ok) throw new Error(response?.error || t("unknownError"));
+    const screenshotDataUrl = await cropScreenshot(response.dataUrl, response.rect, response.viewport);
+    const id = crypto.randomUUID();
+    const slug = `visual-reference-${state.spec.blocks.length + 1}`;
+    const block = {
+      id,
+      kind: "visual-reference",
+      title: response.page.title,
+      url: response.page.url,
+      sourceDomain: response.page.sourceDomain,
+      slug,
+      typeKey: "other",
+      instructions: "",
+      capturedAt: new Date().toISOString(),
+      screenshotId: id,
+      screenshotPath: `references/${String(state.spec.blocks.length + 1).padStart(2, "0")}-${slug}.png`
+    };
+    state.screenshots[id] = screenshotDataUrl;
+    state.spec.blocks.push(block);
+    state.expandedBlockId = id;
+    state.pending = null;
+    await chrome.storage.local.remove("pendingCapture");
+    await chrome.storage.local.set({ screenshots: state.screenshots });
+    await persist();
+    status(t("visualReferenceAdded"));
+  } catch (error) {
+    status(`${t("regionCaptureFailed")}: ${error.message}`);
+  } finally {
+    button.disabled = false;
+  }
 }
 function status(text) { $("#status").textContent = text; setTimeout(() => $("#status").textContent = "", 3500); }
 
@@ -241,6 +323,11 @@ async function discardPending() {
 }
 
 $("#settings-toggle").onclick = () => $("#settings").hidden = !$("#settings").hidden;
+$("#add-screenshot").onclick = addVisualReference;
+$("#copy-collection-id").onclick = async () => {
+  await navigator.clipboard.writeText($("#collection-id").textContent);
+  status(t("numberCopied"));
+};
 $("#saved-pages").onchange = async event => {
   const next = state.workspace.specs.find(spec => spec.id === event.target.value);
   if (!next) return;
@@ -281,9 +368,8 @@ $("#add").onclick = async () => {
     if (screenshotDataUrl) {
       block.screenshotId = block.id;
       block.screenshotPath = `references/${String(position + 1).padStart(2, "0")}-${safeFileName(block.slug)}.png`;
-      const { screenshots = {} } = await chrome.storage.local.get("screenshots");
-      screenshots[block.screenshotId] = screenshotDataUrl;
-      await chrome.storage.local.set({ screenshots });
+      state.screenshots[block.screenshotId] = screenshotDataUrl;
+      await chrome.storage.local.set({ screenshots: state.screenshots });
     }
     state.spec.blocks.splice(position, 0, block);
     state.pending = null;
@@ -300,12 +386,20 @@ $("#copy").onclick = async () => { await navigator.clipboard.writeText(markdown(
 $("#export").onclick = async () => {
   const { screenshots = {} } = await chrome.storage.local.get("screenshots");
   const response = await chrome.runtime.sendMessage({ type: "native", payload: { action: "export", spec: state.spec, markdown: markdown(state.spec), screenshots } });
-  status(response?.ok ? `${t("saved")}: ${response.directory}` : `${t("exportFailed")}: ${response?.error || t("unknownError")}`);
+  if (response?.ok) {
+    $("#collection-id").textContent = response.collectionId;
+    $("#collection-path").textContent = response.directory;
+    $("#collection-path").title = response.directory;
+    $("#export-result").hidden = false;
+    status(`${t("saved")}: ${response.directory}`);
+  } else {
+    status(`${t("exportFailed")}: ${response?.error || t("unknownError")}`);
+  }
 };
 chrome.storage.onChanged.addListener(async (changes, area) => {
   if (area === "local" && changes.pendingCapture) {
     const pending = changes.pendingCapture.newValue || null;
-    const existing = pending && state.spec.blocks.find(block => block.url === pending.url);
+    const existing = pending && state.spec.blocks.find(block => block.kind !== "visual-reference" && block.url === pending.url);
     if (existing) {
       state.pending = null;
       state.expandedBlockId = existing.id;

@@ -13,7 +13,7 @@ const releaseDir = path.join(root, "release");
 fs.mkdirSync(stage, { recursive: true });
 fs.mkdirSync(releaseDir, { recursive: true });
 fs.cpSync(path.join(root, "dist", "extension"), path.join(stage, "extension"), { recursive: true });
-for (const directory of ["native-host", "scripts"]) fs.cpSync(path.join(root, directory), path.join(stage, directory), { recursive: true });
+for (const directory of ["native-host", "scripts", "skills"]) fs.cpSync(path.join(root, directory), path.join(stage, directory), { recursive: true });
 for (const file of [".env.example", "Install on macOS.command", "LICENSE", "PRIVACY.md", "README.md", "package.json"]) fs.copyFileSync(path.join(root, file), path.join(stage, file));
 fs.chmodSync(path.join(stage, "Install on macOS.command"), 0o755);
 

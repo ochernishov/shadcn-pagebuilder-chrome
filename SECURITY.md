@@ -8,9 +8,12 @@ Include affected version, reproduction steps, expected impact, and any suggested
 
 ## Security model
 
-- The extension only runs on the configured host pattern.
+- The context menu is shown on the configured HTTP/HTTPS pattern, while page access is temporary and user-initiated through Chrome's `activeTab` permission.
+- Region selection is injected only after the user clicks **+ Screenshot** and is removed before the PNG is captured.
 - No remote JavaScript is loaded.
-- The Native Messaging host accepts one `export` action.
+- The Native Messaging host accepts only `choose-directory` and `export` actions.
+- Every export receives a random collision-checked six-digit directory with owner-only permissions.
 - Export directory names are normalized before filesystem access.
 - Exported files are created with owner-only permissions.
+- The bundled skill resolves only an exact `Collector/<six-digit-number>/` path in the current directory or its parents.
 - Provider credentials and paid component source code are out of scope and must never be stored by the project.
