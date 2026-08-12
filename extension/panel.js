@@ -2,7 +2,8 @@ import { DEFAULT_LOCALE, LOCALES, MESSAGES, localizeSystemLabels, migrateSystemL
 
 const TYPE_KEYS = ["hero", "navigation", "dashboard", "applicationShell", "dataTable", "logos", "features", "content", "steps", "cta", "pricing", "testimonials", "faq", "footer", "other"];
 const $ = selector => document.querySelector(selector);
-const state = { spec: null, pending: null, locale: DEFAULT_LOCALE, workspace: null, expandedBlockId: null, screenshots: {} };
+const state = { spec: null, pending: null, locale: DEFAULT_LOCALE, workspace: null, expandedBlockId: null, screenshots: {}, settingsExpanded: true, workflowMode: "page", workflowDrafts: { page: null, single: null }, singleItem: null };
+let folderPickerOpen = false;
 const t = key => translate(state.locale, key);
 const safeFileName = value => String(value || "block").normalize("NFKD").replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || "block";
 
@@ -69,7 +70,7 @@ async function setLocale(locale) {
 }
 
 async function hydrate() {
-  const stored = await chrome.storage.local.get(["pageSpec", "workspace", "pendingCapture", "locale", "screenshots"]);
+  const stored = await chrome.storage.local.get(["pageSpec", "workspace", "pendingCapture", "locale", "screenshots", "settingsExpanded", "workflowMode", "workflowDrafts", "singleItem"]);
   state.locale = MESSAGES[stored.locale] ? stored.locale : DEFAULT_LOCALE;
   const legacySpec = stored.pageSpec || defaultSpec();
   if (!legacySpec.id) legacySpec.id = crypto.randomUUID();
@@ -82,22 +83,25 @@ async function hydrate() {
     migrateSystemLabels(spec, state.locale, { project: APP_CONFIG.defaultProject, page: APP_CONFIG.defaultPage });
   });
   state.spec = state.workspace.specs.find(spec => spec.id === state.workspace.activeSpecId) || state.workspace.specs[0];
+  state.settingsExpanded = typeof stored.settingsExpanded === "boolean" ? stored.settingsExpanded : !state.spec.projectDirectory;
+  state.workflowMode = stored.workflowMode === "single" ? "single" : "page";
+  state.workflowDrafts = { page: null, single: null, ...stored.workflowDrafts };
+  state.singleItem = stored.singleItem || null;
   state.screenshots = stored.screenshots || {};
-  state.pending = stored.pendingCapture || null;
-  const existing = state.pending && state.spec.blocks.find(block => block.kind !== "visual-reference" && block.url === state.pending.url);
+  state.pending = stored.pendingCapture || state.workflowDrafts[state.workflowMode] || null;
+  state.workflowDrafts[state.workflowMode] = state.pending;
+  const existing = state.workflowMode === "page" && state.pending && state.spec.blocks.find(block => block.kind !== "visual-reference" && block.url === state.pending.url);
   if (existing) {
     state.expandedBlockId = existing.id;
     state.pending = null;
+    state.workflowDrafts.page = null;
     await chrome.storage.local.remove("pendingCapture");
+    await chrome.storage.local.set({ workflowDrafts: state.workflowDrafts });
   }
   render();
   if (existing) status(t("alreadyAdded"));
   await chrome.runtime.sendMessage({ type: "panel-ready" });
   await chrome.runtime.sendMessage({ type: "set-locale", locale: state.locale });
-  if (!state.pending) {
-    const response = await chrome.runtime.sendMessage({ type: "capture-active" });
-    if (!response?.ok) status(`${t("captureFailed")}: ${response?.error || t("unknownError")}`);
-  }
 }
 
 function markdown(spec) {
@@ -143,6 +147,72 @@ function renderPageMode() {
   })));
 }
 
+function renderSettings() {
+  const expanded = state.settingsExpanded;
+  const mode = t(state.spec.pageMode === "edit" ? "editPage" : "createPage");
+  $("#settings").setAttribute("aria-expanded", String(expanded));
+  $("#settings-toggle").setAttribute("aria-expanded", String(expanded));
+  $("#settings-toggle").setAttribute("aria-label", t(expanded ? "collapseProjectSettings" : "expandProjectSettings"));
+  $("#settings-fields").hidden = !expanded;
+  $("#settings-summary-title").textContent = `${state.spec.project} / ${state.spec.page}`;
+  $("#settings-summary-meta").textContent = `${state.spec.route} · ${mode}`;
+}
+
+function renderWorkflow() {
+  const single = state.workflowMode === "single";
+  document.querySelectorAll(".page-workflow").forEach(element => { element.hidden = single; });
+  $("#single-workspace").hidden = !single;
+  $("#page-mode-tab").setAttribute("aria-selected", String(!single));
+  $("#single-mode-tab").setAttribute("aria-selected", String(single));
+  $("#page-mode-tab").tabIndex = single ? -1 : 0;
+  $("#single-mode-tab").tabIndex = single ? 0 : -1;
+  $("#app-eyebrow").textContent = t(single ? "singleDesignIntent" : "designIntent");
+  $("#capture-position-field").hidden = single;
+  $("#add").textContent = t(single ? "prepareSingle" : "addBlock");
+  renderSingleItem();
+}
+
+function renderSingleItem() {
+  const block = state.singleItem;
+  $("#single-empty").hidden = Boolean(block || state.pending);
+  $("#single-result").hidden = !block;
+  if (!block) return;
+  $("#single-title").textContent = block.title;
+  $("#single-domain").textContent = block.sourceDomain || block.slug;
+  $("#single-type").textContent = MESSAGES[state.locale].types[normalizeTypeKey(block)];
+  $("#single-source").href = block.url;
+  $("#single-source").textContent = `${block.url} ↗`;
+  $("#single-notes-row").hidden = !block.instructions;
+  $("#single-notes").textContent = block.instructions || "";
+  const screenshot = block.screenshotId && state.screenshots[block.screenshotId];
+  const previewSlot = $("#single-preview-slot");
+  previewSlot.replaceChildren();
+  if (screenshot) {
+    const preview = document.createElement("img");
+    preview.className = "block-preview";
+    preview.src = screenshot;
+    preview.alt = t("screenshotPreviewAlt");
+    previewSlot.append(preview);
+  }
+}
+
+async function setWorkflowMode(mode) {
+  if (!["page", "single"].includes(mode) || mode === state.workflowMode) return;
+  state.workflowDrafts[state.workflowMode] = state.pending;
+  state.workflowMode = mode;
+  state.pending = state.workflowDrafts[mode] || null;
+  await chrome.storage.local.set({ workflowMode: mode, workflowDrafts: state.workflowDrafts });
+  if (state.pending) await chrome.storage.local.set({ pendingCapture: state.pending });
+  else await chrome.storage.local.remove("pendingCapture");
+  render();
+}
+
+async function setSettingsExpanded(expanded) {
+  state.settingsExpanded = expanded;
+  await chrome.storage.local.set({ settingsExpanded: expanded });
+  renderSettings();
+}
+
 async function createSpec(project, page, labelKeys = {}) {
   const spec = { ...defaultSpec(), project, page };
   if (labelKeys.projectLabelKey) spec.projectLabelKey = labelKeys.projectLabelKey;
@@ -155,10 +225,19 @@ async function createSpec(project, page, labelKeys = {}) {
 }
 
 async function requestProjectFolder() {
-  const response = await chrome.runtime.sendMessage({ type: "native", payload: { action: "choose-directory", prompt: t("projectFolder") } });
-  if (response?.ok) return response;
-  if (!response?.canceled) status(`${t("chooseFolderFailed")}: ${response?.error || t("unknownError")}`);
-  return null;
+  if (folderPickerOpen) return null;
+  folderPickerOpen = true;
+  const buttons = [$("#choose-folder"), $("#new-project")];
+  buttons.forEach(button => { button.disabled = true; });
+  try {
+    const response = await chrome.runtime.sendMessage({ type: "native", payload: { action: "choose-directory", prompt: t("projectFolder") } });
+    if (response?.ok) return response;
+    if (!response?.canceled && !response?.busy) status(`${t("chooseFolderFailed")}: ${response?.error || t("unknownError")}`);
+    return null;
+  } finally {
+    folderPickerOpen = false;
+    buttons.forEach(button => { button.disabled = false; });
+  }
 }
 
 async function chooseFolderForCurrentSpec() {
@@ -167,6 +246,8 @@ async function chooseFolderForCurrentSpec() {
   state.spec.projectDirectory = selected.directory;
   state.spec.project = selected.name;
   delete state.spec.projectLabelKey;
+  state.settingsExpanded = false;
+  await chrome.storage.local.set({ settingsExpanded: false });
   await persist();
 }
 
@@ -175,12 +256,13 @@ function render() {
   renderLanguageSwitcher();
   renderWorkspace();
   renderPageMode();
+  renderSettings();
+  renderWorkflow();
   $("#project-folder").textContent = state.spec.projectDirectory || t("noFolder");
   $("#project-folder").title = state.spec.projectDirectory || t("noFolder");
   $("#page").value = state.spec.page;
   $("#route").value = state.spec.route;
   $("#page-title").textContent = state.spec.page;
-  $("#count").textContent = state.spec.blocks.length;
   $("#empty").hidden = state.spec.blocks.length > 0;
   $("#blocks").replaceChildren(...state.spec.blocks.map((block, index) => {
     const li = document.createElement("li");
@@ -232,6 +314,56 @@ function render() {
   }
 }
 
+function singleBlockPrompt(block) {
+  return JSON.stringify({
+    schemaVersion: 1,
+    kind: "single-block",
+    task: t("singleAgentTask"),
+    source: {
+      title: block.title,
+      url: block.url,
+      domain: block.sourceDomain,
+      slug: block.slug,
+      capturedAt: block.capturedAt,
+      selectedText: block.selectionText || null
+    },
+    section: {
+      typeKey: normalizeTypeKey(block),
+      label: MESSAGES[state.locale].types[normalizeTypeKey(block)]
+    },
+    implementationNotes: block.instructions || t("fallbackChange"),
+    screenshotIncluded: Boolean(block.screenshotId),
+    accessPolicy: t("singleAccessPolicy")
+  }, null, 2);
+}
+
+async function copySingleItem() {
+  if (!state.singleItem) return;
+  const text = singleBlockPrompt(state.singleItem);
+  const screenshot = state.singleItem.screenshotId && state.screenshots[state.singleItem.screenshotId];
+  if (screenshot && globalThis.ClipboardItem && navigator.clipboard.write) {
+    try {
+      const image = await fetch(screenshot).then(response => response.blob());
+      const item = new ClipboardItem({
+        "text/plain": new Blob([text], { type: "text/plain" }),
+        "image/png": image
+      });
+      await navigator.clipboard.write([item]);
+      status(t("singleCopiedWithScreenshot"));
+      return;
+    } catch {}
+  }
+  await navigator.clipboard.writeText(text);
+  status(t("singleCopied"));
+}
+
+async function clearSingleItem() {
+  if (state.singleItem?.screenshotId) delete state.screenshots[state.singleItem.screenshotId];
+  state.singleItem = null;
+  await chrome.storage.local.set({ singleItem: null, screenshots: state.screenshots });
+  render();
+}
+
 async function move(index, delta) {
   const target = index + delta;
   if (target < 0 || target >= state.spec.blocks.length) return;
@@ -275,8 +407,9 @@ async function cropScreenshot(dataUrl, rect, viewport) {
 async function addVisualReference() {
   const button = $("#add-screenshot");
   button.disabled = true;
-  status(t("selectRegionStatus"));
   try {
+    await requestCapturePermission();
+    status(t("selectRegionStatus"));
     const response = await chrome.runtime.sendMessage({
       type: "capture-selected-region",
       labels: { hint: t("regionSelectionHint"), cancel: t("regionSelectionCancel"), noActivePage: t("noActiveWebPage") }
@@ -303,8 +436,9 @@ async function addVisualReference() {
     state.spec.blocks.push(block);
     state.expandedBlockId = id;
     state.pending = null;
+    state.workflowDrafts.page = null;
     await chrome.storage.local.remove("pendingCapture");
-    await chrome.storage.local.set({ screenshots: state.screenshots });
+    await chrome.storage.local.set({ screenshots: state.screenshots, workflowDrafts: state.workflowDrafts });
     await persist();
     status(t("visualReferenceAdded"));
   } catch (error) {
@@ -315,14 +449,35 @@ async function addVisualReference() {
 }
 function status(text) { $("#status").textContent = text; setTimeout(() => $("#status").textContent = "", 3500); }
 
+async function requestCapturePermission() {
+  const granted = await chrome.permissions.request({ origins: [APP_CONFIG.allowedHostPattern] });
+  if (!granted) throw new Error(t("siteAccessRequired"));
+}
+
+async function captureActiveFromPanel(button) {
+  button.disabled = true;
+  try {
+    await requestCapturePermission();
+    const response = await chrome.runtime.sendMessage({ type: "capture-active" });
+    if (!response?.ok) throw new Error(response?.error || t("unknownError"));
+    status(t("currentPageCaptured"));
+  } catch (error) {
+    status(`${t("captureFailed")}: ${error.message}`);
+  } finally {
+    button.disabled = false;
+  }
+}
+
 async function discardPending() {
   const button = $("#discard");
   button.disabled = true;
   state.pending = null;
+  state.workflowDrafts[state.workflowMode] = null;
   $("#capture").hidden = true;
   delete $("#block-type").dataset.captureId;
   try {
     await chrome.storage.local.remove("pendingCapture");
+    await chrome.storage.local.set({ workflowDrafts: state.workflowDrafts });
     status(t("blockDiscarded"));
   } catch (error) {
     status(`${t("discardFailed")}: ${error.message}`);
@@ -332,8 +487,21 @@ async function discardPending() {
   }
 }
 
-$("#settings-toggle").onclick = () => $("#settings").hidden = !$("#settings").hidden;
+$("#settings-toggle").onclick = () => setSettingsExpanded(!state.settingsExpanded);
+document.querySelectorAll("[data-workflow-mode]").forEach(button => {
+  button.onclick = () => setWorkflowMode(button.dataset.workflowMode);
+  button.onkeydown = event => {
+    if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    event.preventDefault();
+    const next = button.dataset.workflowMode === "page" ? "single" : "page";
+    void setWorkflowMode(next).then(() => $(`[data-workflow-mode="${next}"]`).focus());
+  };
+});
+$("#add-current-page").onclick = () => captureActiveFromPanel($("#add-current-page"));
+$("#single-capture").onclick = () => captureActiveFromPanel($("#single-capture"));
 $("#add-screenshot").onclick = addVisualReference;
+$("#copy-single").onclick = copySingleItem;
+$("#clear-single").onclick = clearSingleItem;
 $("#copy-collection-id").onclick = async () => {
   await navigator.clipboard.writeText($("#collection-id").textContent);
   status(t("numberCopied"));
@@ -354,6 +522,8 @@ $("#new-project").onclick = async () => {
   const usesDefaultPage = page.trim() === t("defaultPageName");
   await createSpec(selected.name, page.trim(), usesDefaultPage ? { pageLabelKey: "defaultPageName" } : {});
   state.spec.projectDirectory = selected.directory;
+  state.settingsExpanded = false;
+  await chrome.storage.local.set({ settingsExpanded: false });
   await persist();
 };
 $("#new-page").onclick = async () => {
@@ -378,19 +548,28 @@ $("#add").onclick = async () => {
       if (screenshot?.ok) screenshotDataUrl = screenshot.dataUrl;
       else status(`${t("screenshotFailed")}: ${screenshot?.error || t("unknownError")}`);
     }
-    const position = Math.max(0, Math.min(state.spec.blocks.length, Number($("#position").value) - 1));
+    const position = state.workflowMode === "single" ? 0 : Math.max(0, Math.min(state.spec.blocks.length, Number($("#position").value) - 1));
     const block = { ...state.pending, typeKey: $("#block-type").value, instructions: $("#instructions").value.trim() };
     if (screenshotDataUrl) {
       block.screenshotId = block.id;
-      block.screenshotPath = `references/${String(position + 1).padStart(2, "0")}-${safeFileName(block.slug)}.png`;
+      if (state.workflowMode === "page") block.screenshotPath = `references/${String(position + 1).padStart(2, "0")}-${safeFileName(block.slug)}.png`;
       state.screenshots[block.screenshotId] = screenshotDataUrl;
+    }
+    if (state.workflowMode === "single") {
+      if (state.singleItem?.screenshotId && state.singleItem.screenshotId !== block.screenshotId) delete state.screenshots[state.singleItem.screenshotId];
+      state.singleItem = block;
+      await chrome.storage.local.set({ singleItem: block, screenshots: state.screenshots });
+    } else {
+      state.spec.blocks.splice(position, 0, block);
       await chrome.storage.local.set({ screenshots: state.screenshots });
     }
-    state.spec.blocks.splice(position, 0, block);
     state.pending = null;
+    state.workflowDrafts[state.workflowMode] = null;
     await chrome.storage.local.remove("pendingCapture");
-    await persist();
-    status(t("blockAdded"));
+    await chrome.storage.local.set({ workflowDrafts: state.workflowDrafts });
+    if (state.workflowMode === "page") await persist();
+    else render();
+    status(t(state.workflowMode === "single" ? "singlePrepared" : "blockAdded"));
   } catch (error) {
     status(`${t("captureFailed")}: ${error.message}`);
   } finally {
@@ -414,15 +593,20 @@ $("#export").onclick = async () => {
 chrome.storage.onChanged.addListener(async (changes, area) => {
   if (area === "local" && changes.pendingCapture) {
     const pending = changes.pendingCapture.newValue || null;
-    const existing = pending && state.spec.blocks.find(block => block.kind !== "visual-reference" && block.url === pending.url);
+    const existing = state.workflowMode === "page" && pending && state.spec.blocks.find(block => block.kind !== "visual-reference" && block.url === pending.url);
     if (existing) {
       state.pending = null;
+      state.workflowDrafts.page = null;
       state.expandedBlockId = existing.id;
       await chrome.storage.local.remove("pendingCapture");
+      await chrome.storage.local.set({ workflowDrafts: state.workflowDrafts });
       status(t("alreadyAdded"));
     } else {
       state.pending = pending;
+      state.workflowDrafts[state.workflowMode] = pending;
+      await chrome.storage.local.set({ workflowDrafts: state.workflowDrafts });
     }
+    await chrome.runtime.sendMessage({ type: "panel-ready" });
     render();
   }
 });
