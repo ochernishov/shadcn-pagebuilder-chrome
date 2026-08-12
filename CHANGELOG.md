@@ -2,6 +2,22 @@
 
 ## [Unreleased] — 2026-08-12
 
+## [0.6.0] — 2026-08-12
+
+### Added
+
+- Source-neutral capture on any configured HTTP or HTTPS website.
+- **+ Screenshot** action with an in-page drag selector, precise PNG cropping, automatic outline insertion, and expandable local preview.
+- Explicit `source` and `visual-reference` item kinds in specification version 3.
+- Localized region-selection and agent-decision instructions in EN, RU, FR, IT, and ZH.
+
+### Changed
+
+- Subscription and source-access decisions now belong to the implementation agent, not the Collector.
+- New captures store factual source metadata instead of generating a Shadcn Blocks registry command.
+- The extension uses temporary `activeTab` access and does not request persistent all-sites host permission.
+- Exported instructions tell agents to use official installers only when authorized and otherwise create an original implementation from the visible reference.
+
 ## [0.5.0] — 2026-08-12
 
 ### Added

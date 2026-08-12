@@ -39,5 +39,46 @@ Object.assign(base.fr, { projectFolder: "Dossier du projet", chooseFolder: "Choi
 Object.assign(base.it, { projectFolder: "Cartella progetto", chooseFolder: "Scegli cartella", noFolder: "Nessuna cartella selezionata", pageMode: "Attività pagina", createPage: "Crea", editPage: "Modifica", alreadyAdded: "Questo blocco è già nella pagina corrente", openSource: "Apri sorgente", registryLabel: "Registry", installCommandLabel: "Comando di installazione", notesLabel: "Note", screenshotIncluded: "Screenshot incluso", chooseFolderFailed: "Impossibile scegliere la cartella del progetto" });
 Object.assign(base.zh, { projectFolder: "项目文件夹", chooseFolder: "选择文件夹", noFolder: "未选择文件夹", pageMode: "页面任务", createPage: "创建", editPage: "编辑", alreadyAdded: "当前页面已包含此模块", openSource: "打开来源", registryLabel: "Registry", installCommandLabel: "安装命令", notesLabel: "备注", screenshotIncluded: "已附加截图", chooseFolderFailed: "无法选择项目文件夹" });
 
+Object.assign(base.en, {
+  addScreenshot: "Screenshot", visualReferenceItem: "Visual reference", capturedText: "Captured text",
+  visualReferenceFallback: "Recreate this section from the screenshot as an original implementation that fits the target project. Determine layout, behavior, responsive states, and accessible interactions from the visible reference.",
+  screenshotPreviewAlt: "Captured visual reference", selectRegionStatus: "Select an area on the page", regionSelectionHint: "Drag to select the reference area", regionSelectionCancel: "Esc — cancel",
+  regionSelectionCanceled: "Screenshot canceled", visualReferenceAdded: "Visual reference added", regionCaptureFailed: "Could not capture the selected area",
+  emptyHint: "Capture a source page or add a screenshot reference.",
+  agentSteps: ["Inspect the repository before modifying code.", "Review every source URL, screenshot, and captured note.", "Use an official install command only when it is available and authorized in the user's environment.", "When source access is unavailable, create an original implementation from the visible reference without bypassing access controls or copying proprietary code.", "Adapt every item to the existing design system and avoid duplicate primitives.", "Preserve responsive behavior and accessibility.", "Run lint, typecheck, and tests, then update relevant documentation."]
+});
+Object.assign(base.ru, {
+  addScreenshot: "Скриншот", visualReferenceItem: "Визуальный референс", capturedText: "Сохранённый текст",
+  visualReferenceFallback: "Самостоятельно воссоздать секцию по скриншоту и адаптировать её к целевому проекту. Определить по видимому референсу композицию, поведение, адаптивные состояния и доступные взаимодействия.",
+  screenshotPreviewAlt: "Сохранённый визуальный референс", selectRegionStatus: "Выделите область на странице", regionSelectionHint: "Протяните рамку вокруг нужной области", regionSelectionCancel: "Esc — отменить",
+  regionSelectionCanceled: "Скриншот отменён", visualReferenceAdded: "Визуальный референс добавлен", regionCaptureFailed: "Не удалось снять выбранную область",
+  emptyHint: "Добавьте страницу-источник или снимок произвольной области.",
+  agentSteps: ["Изучить репозиторий до внесения изменений.", "Проверить каждую ссылку, скриншот и сохранённую заметку.", "Использовать официальную команду установки только при наличии разрешённого доступа в окружении пользователя.", "Если исходник недоступен, создать оригинальную реализацию по видимому референсу, не обходя ограничения доступа и не копируя закрытый код.", "Адаптировать каждый элемент к существующей дизайн-системе и не создавать дублирующиеся примитивы.", "Сохранить адаптивность и доступность.", "Запустить lint, typecheck и тесты, затем обновить документацию."]
+});
+Object.assign(base.fr, {
+  addScreenshot: "Capture", visualReferenceItem: "Référence visuelle", capturedText: "Texte capturé",
+  visualReferenceFallback: "Recréer cette section à partir de la capture avec une implémentation originale adaptée au projet cible. Déduire la mise en page, le comportement, le responsive et les interactions accessibles.",
+  screenshotPreviewAlt: "Référence visuelle capturée", selectRegionStatus: "Sélectionnez une zone de la page", regionSelectionHint: "Faites glisser pour sélectionner la zone de référence", regionSelectionCancel: "Échap — annuler",
+  regionSelectionCanceled: "Capture annulée", visualReferenceAdded: "Référence visuelle ajoutée", regionCaptureFailed: "Impossible de capturer la zone sélectionnée",
+  emptyHint: "Capturez une page source ou ajoutez une référence visuelle.",
+  agentSteps: ["Inspecter le dépôt avant toute modification.", "Examiner chaque URL, capture et note enregistrée.", "N’utiliser une commande d’installation officielle que si l’environnement de l’utilisateur y est autorisé.", "Si la source est inaccessible, créer une implémentation originale à partir de la référence visible sans contourner les contrôles d’accès ni copier du code propriétaire.", "Adapter chaque élément au système de design existant sans dupliquer les primitives.", "Préserver le responsive et l’accessibilité.", "Exécuter lint, typecheck et les tests, puis mettre à jour la documentation."]
+});
+Object.assign(base.it, {
+  addScreenshot: "Screenshot", visualReferenceItem: "Riferimento visivo", capturedText: "Testo acquisito",
+  visualReferenceFallback: "Ricreare la sezione dallo screenshot con un’implementazione originale adatta al progetto. Dedurre layout, comportamento, stati responsive e interazioni accessibili.",
+  screenshotPreviewAlt: "Riferimento visivo acquisito", selectRegionStatus: "Seleziona un’area della pagina", regionSelectionHint: "Trascina per selezionare l’area di riferimento", regionSelectionCancel: "Esc — annulla",
+  regionSelectionCanceled: "Screenshot annullato", visualReferenceAdded: "Riferimento visivo aggiunto", regionCaptureFailed: "Impossibile acquisire l’area selezionata",
+  emptyHint: "Acquisisci una pagina sorgente o aggiungi un riferimento visivo.",
+  agentSteps: ["Esaminare il repository prima delle modifiche.", "Controllare ogni URL, screenshot e nota acquisita.", "Usare un comando di installazione ufficiale solo quando l’ambiente dell’utente dispone dell’accesso autorizzato.", "Se il sorgente non è disponibile, creare un’implementazione originale dal riferimento visibile senza aggirare i controlli di accesso o copiare codice proprietario.", "Adattare ogni elemento al design system esistente senza duplicare primitive.", "Mantenere responsive design e accessibilità.", "Eseguire lint, typecheck e test, quindi aggiornare la documentazione."]
+});
+Object.assign(base.zh, {
+  addScreenshot: "截图", visualReferenceItem: "视觉参考", capturedText: "采集的文本",
+  visualReferenceFallback: "根据截图创建适合目标项目的原创实现，并从可见参考中推断布局、行为、响应式状态和无障碍交互。",
+  screenshotPreviewAlt: "已采集的视觉参考", selectRegionStatus: "请在页面上选择区域", regionSelectionHint: "拖动以选择参考区域", regionSelectionCancel: "Esc — 取消",
+  regionSelectionCanceled: "已取消截图", visualReferenceAdded: "已添加视觉参考", regionCaptureFailed: "无法截取所选区域",
+  emptyHint: "采集来源页面或添加截图参考。",
+  agentSteps: ["修改代码前先检查仓库。", "检查每个来源链接、截图和采集备注。", "仅在用户环境具有授权访问时使用官方安装命令。", "无法访问源代码时，根据可见参考创建原创实现，不绕过访问控制，也不复制专有代码。", "让每个项目适配现有设计系统，并避免重复基础组件。", "保持响应式行为和可访问性。", "运行 lint、类型检查和测试，然后更新相关文档。"]
+});
+
 export const MESSAGES = Object.fromEntries(Object.entries(base).map(([locale, messages]) => [locale, { ...messages, types: Object.fromEntries(typeKeys.map((key, index) => [key, commonTypes[locale][index]])) }]));
 export function translate(locale, key) { return MESSAGES[locale]?.[key] ?? MESSAGES[DEFAULT_LOCALE][key] ?? key; }

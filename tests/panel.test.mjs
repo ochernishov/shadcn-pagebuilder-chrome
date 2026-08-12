@@ -25,8 +25,26 @@ test("workspace supports multiple saved specifications", () => {
 
 test("pending captures are deduplicated by source URL", () => {
   const source = fs.readFileSync("extension/panel.js", "utf8");
-  assert.match(source, /blocks\.find\(block => block\.url === pending\.url\)/);
+  assert.match(source, /blocks\.find\(block => block\.kind !== "visual-reference" && block\.url === pending\.url\)/);
   assert.match(source, /state\.expandedBlockId = existing\.id/);
+});
+
+test("manual screenshots are cropped and stored as visual references", () => {
+  const source = fs.readFileSync("extension/panel.js", "utf8");
+  const html = fs.readFileSync("extension/panel.html", "utf8");
+  assert.match(html, /id="add-screenshot"/);
+  assert.match(source, /async function cropScreenshot/);
+  assert.match(source, /type: "capture-selected-region"/);
+  assert.match(source, /kind: "visual-reference"/);
+  assert.match(source, /state\.spec\.blocks\.push\(block\)/);
+});
+
+test("agent export decides between authorized install and original implementation", () => {
+  const source = fs.readFileSync("extension/panel.js", "utf8");
+  const i18n = fs.readFileSync("extension/i18n.js", "utf8");
+  assert.equal(source.includes("Source library}: Shadcn Blocks"), false);
+  assert.match(i18n, /official install command only when it is available and authorized/);
+  assert.match(i18n, /create an original implementation from the visible reference/);
 });
 
 test("collected blocks render expandable source details", () => {
