@@ -20,4 +20,5 @@ Shadcn Page Collector consists of a Chrome Manifest V3 extension and a local Nod
 - Keep `skills/shadcn-collector/` compatible with both Codex and Claude Code; validate it after edits.
 - Keep all user-facing strings in `extension/i18n.js`; English is the default locale.
 - Store stable `typeKey` values instead of localized labels in block data.
+- Keep public documentation screenshots as numbered lowercase JPEG files and synchronize `docs/screenshots/images.manifest.json` after every replacement.
 - Never commit `.env`, `dist/`, paid block source, or fonts without a permissive redistribution license.

@@ -2,6 +2,7 @@ import "./config.js";
 import { translate } from "./i18n.js";
 
 const MENU_ID = "page-collector-add";
+let directoryPickerOpen = false;
 
 function createContextMenu(locale = "en") {
   chrome.contextMenus.removeAll(() => chrome.contextMenus.create({
@@ -33,6 +34,21 @@ async function capture(tab, selectionText = "") {
     capturedAt: new Date().toISOString()
   }});
 }
+
+async function signalPendingCapture() {
+  await chrome.action.setBadgeText({ text: "1" });
+  await chrome.action.setBadgeBackgroundColor({ color: "#ff5c35" });
+}
+
+chrome.commands.onCommand.addListener((command, tab) => {
+  if (command !== "capture-block") return;
+  const captureActiveTab = tab?.id
+    ? capture(tab)
+    : chrome.tabs.query({ active: true, currentWindow: true }).then(([activeTab]) => capture(activeTab));
+  void captureActiveTab
+    .then(signalPendingCapture)
+    .catch(error => console.error("Could not capture the active page:", error));
+});
 
 function selectPageRegion(labels) {
   return new Promise(resolve => {
@@ -129,8 +145,7 @@ async function captureSelectedRegion(labels) {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === MENU_ID) {
     void capture(tab, info.selectionText || "")
-      .then(() => chrome.action.setBadgeText({ text: "1" }))
-      .then(() => chrome.action.setBadgeBackgroundColor({ color: "#ff5c35" }))
+      .then(signalPendingCapture)
       .catch(error => console.error("Не удалось добавить блок:", error));
   }
 });
@@ -167,8 +182,18 @@ chrome.runtime.onMessage.addListener((message, _sender, respond) => {
     return true;
   }
   if (message.type !== "native") return false;
+  if (message.payload?.action === "choose-directory") {
+    if (directoryPickerOpen) {
+      respond({ ok: false, busy: true });
+      return false;
+    }
+    directoryPickerOpen = true;
+  }
   chrome.runtime.sendNativeMessage(globalThis.APP_CONFIG.nativeHostName, message.payload)
     .then(respond)
-    .catch(error => respond({ ok: false, error: error.message }));
+    .catch(error => respond({ ok: false, error: error.message }))
+    .finally(() => {
+      if (message.payload?.action === "choose-directory") directoryPickerOpen = false;
+    });
   return true;
 });

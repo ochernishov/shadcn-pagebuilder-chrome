@@ -2,6 +2,60 @@
 
 ## [Unreleased] — 2026-08-12
 
+### Documentation
+
+- Replaced the obsolete seven-PNG screenshot brief with 13 named JPEG slots covering workflow selection, project and Chrome setup, both capture modes, page editing, export, agent handoff, and localization.
+- Added a screenshot manifest that tracks every public image slot, its intended use, target framing, and readiness without committing private captures or placeholders.
+
+## [0.9.2] — 2026-08-12
+
+### Fixed
+
+- Selected-area screenshots now request Chrome's exact optional `<all_urls>` capability required by `captureVisibleTab()`, instead of the insufficient `*://*/*` match pattern that produced an `Either the '<all_urls>' or 'activeTab' permission is required` error after region selection.
+
+### Changed
+
+- Context-menu visibility (`ALLOWED_HOST_PATTERN`) and screenshot permission (`CAPTURE_HOST_PERMISSION`) are now separate environment settings.
+
+## [0.9.1] — 2026-08-12
+
+### Added
+
+- Expanded page items now include an editable implementation-notes field with an explicit save action and `Command+Enter` / `Ctrl+Enter` shortcut.
+
+### Changed
+
+- Revised notes are persisted in the active page specification and automatically used by copied prompts and subsequent JSON/Markdown exports.
+
+## [0.9.0] — 2026-08-12
+
+### Added
+
+- Independent **Page** and **One block** workflows with an accessible tab switcher below the application title.
+- Standalone block preparation and agent-ready structured JSON copying, with an additional PNG clipboard representation when a screenshot is included and supported.
+- Persisted per-workflow capture drafts, so switching modes does not alter the collected page or lose unfinished work.
+
+### Changed
+
+- Project settings, page ordering, prompt export, and numbered Collector packages are shown only in **Page** mode; **One block** requires no project setup.
+
+## [0.8.1] — 2026-08-12
+
+### Fixed
+
+- Restored `Command+Shift+K` as a dedicated active-page capture command instead of Chrome's `_execute_action`, so the shortcut no longer opens or closes the side panel.
+- An already open panel now clears the capture badge as soon as it receives the shortcut capture.
+- Side-panel page and screenshot buttons now request optional website access after the user's click instead of failing with `No active web page`.
+- Project folder selection now allows only one native macOS picker at a time, preventing repeated clicks from queuing duplicate dialogs.
+- Long project paths and translated controls no longer widen the Chrome side panel or push settings content off-screen.
+
+### Changed
+
+- Project settings now collapse into a persistent one-line summary showing project, page, route, and Create/Edit intent; choosing a project folder collapses the settings automatically.
+- The page workspace now shows the page name followed by explicit **Add current page** and **Add screenshot** actions; the redundant `CURRENT PAGE` label and circular item counter were removed.
+- Opening the side panel no longer captures the active tab automatically. Capture happens only through the dedicated button, keyboard command, or context menu.
+- Installation and update instructions now require verifying the capture command in `chrome://extensions/shortcuts` and document the **Add current page** fallback.
+
 ## [0.8.0] — 2026-08-12
 
 ### Added

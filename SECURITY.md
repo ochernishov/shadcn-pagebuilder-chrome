@@ -8,8 +8,9 @@ Include affected version, reproduction steps, expected impact, and any suggested
 
 ## Security model
 
-- The context menu is shown on the configured HTTP/HTTPS pattern, while page access is temporary and user-initiated through Chrome's `activeTab` permission.
-- Region selection is injected only after the user clicks **+ Screenshot** and is removed before the PNG is captured.
+- The context menu and keyboard command use temporary, user-initiated `activeTab` access.
+- Side-panel capture buttons request the configurable `<all_urls>` screenshot capability as an optional Chrome permission only after an explicit click. Chrome users can decline or revoke that access.
+- Region selection is injected only after the user clicks **Add screenshot** and is removed before the PNG is captured.
 - No remote JavaScript is loaded.
 - The Native Messaging host accepts only `choose-directory` and `export` actions.
 - Every export receives a random collision-checked six-digit directory with owner-only permissions.
