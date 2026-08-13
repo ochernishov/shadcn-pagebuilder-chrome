@@ -90,7 +90,10 @@ try {
   message.spec.exportedAt = new Date().toISOString();
   const screenshots = message.screenshots || {};
   for (const block of message.spec.blocks || []) {
-    if (!block.screenshotId || !block.screenshotPath || !screenshots[block.screenshotId]) continue;
+    if (!block.screenshotId || !block.screenshotPath || !screenshots[block.screenshotId]) {
+      block.screenshotPath = null;
+      continue;
+    }
     const filename = `${String((message.spec.blocks.indexOf(block) + 1)).padStart(2, "0")}-${safeName(block.slug)}.png`;
     block.screenshotPath = `references/${filename}`;
     const references = path.join(directory, "references");

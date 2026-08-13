@@ -146,7 +146,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === MENU_ID) {
     void capture(tab, info.selectionText || "")
       .then(signalPendingCapture)
-      .catch(error => console.error("Не удалось добавить блок:", error));
+      .catch(error => console.error("Could not add the block:", error));
   }
 });
 

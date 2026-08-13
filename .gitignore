@@ -1,5 +1,6 @@
 .env
 dist/
+docs/screenshots/* - 1.jpg
 .DS_Store
 *.log
 node_modules/

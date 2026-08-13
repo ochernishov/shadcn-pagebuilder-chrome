@@ -1,6 +1,18 @@
 # Changelog
 
-## [Unreleased] — 2026-08-12
+## [Unreleased]
+
+### Fixed
+
+- Exported `page-spec.json` no longer keeps a stale `screenshotPath` when a block's screenshot data is missing at export time.
+- The context-menu capture error is now logged in English, matching the rest of the worker's log messages.
+
+### Documentation
+
+- Folded the released 0.10.0 documentation notes out of the Unreleased section and refreshed the architecture outlook to point at the GitHub Project roadmap.
+- The intentionally unpublished local screenshot variant (`* - 1.jpg`) is now ignored by Git so it cannot be committed accidentally.
+
+## [0.10.0] — 2026-08-12
 
 ### Documentation
 
@@ -8,8 +20,6 @@
 - Added a screenshot manifest that tracks every public image slot, its intended use, target framing, and readiness without committing private captures or placeholders.
 - Translated the screenshot-production brief into Russian while preserving all public JPEG filenames in English.
 - Replaced the standalone screenshot gallery with real images embedded alongside installation, collection, editing, agent handoff, and localization instructions.
-
-## [0.10.0] — 2026-08-12
 
 ### Changed
 

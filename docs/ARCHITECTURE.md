@@ -62,6 +62,4 @@ At export time, the host adds the package-level `collectionId` and `exportedAt` 
 
 ## Potential next versions
 
-- Drag-and-drop block ordering.
-- Optional element-aware capture in addition to rectangular region selection.
-- Coding-agent launch after export.
+Planned work is tracked as epics and sub-issues in the repository's GitHub Project. Current direction, in short: stay local-first and capture-focused; deepen the bridge to coding agents (element-aware capture, drag-and-drop ordering, MCP resource export, edit-mode diff context) rather than generate code inside the extension.
