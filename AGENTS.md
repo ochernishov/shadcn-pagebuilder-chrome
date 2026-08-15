@@ -1,5 +1,11 @@
 # Project instructions
 
+
+⚖️ **Закон разработки — [RootDev.md](RootDev.md). Прочитать до первой правки:**
+архитектура и границы доменов, инфраструктура и CI/CD, безопасность данных,
+git flow, журнал решений. Отклонения проекта — секцией внизу того же файла;
+отклоняться без записи и ADR нельзя.
+
 ## Scope
 
 Shadcn Page Collector consists of a Chrome Manifest V3 extension and a local Node.js Native Messaging host.
