@@ -16,7 +16,10 @@ Native Host локально.
   `dist/extension/`.
 - `scripts/install-host.mjs` / `scripts/uninstall-host.mjs` — регистрируют
   Native Messaging host в системе (ID выводится из `EXTENSION_PUBLIC_KEY`),
-  ставят/убирают `skills/shadcn-collector/` в каталоги Codex/Claude Code.
+  копируют собранное расширение (`extension/` из релизного пакета или
+  `dist/extension/` при сборке из исходников) в постоянный
+  `~/Library/Application Support/<APP_NAME>/extension/`, ставят/убирают
+  `skills/shadcn-collector/` в каталоги Codex/Claude Code.
 - `scripts/package-release.mjs` — собирает релизный архив.
 
 ## API / Интерфейс
@@ -33,4 +36,7 @@ CLI через `npm run build | install:host | uninstall:host | package | setup`
 
 ## Последние изменения
 
+- **2026-08-18** — `install-host.mjs`/`uninstall-host.mjs` копируют/удаляют
+  постоянную копию расширения в Application Support вместо того, чтобы Chrome
+  ссылался на папку временной распаковки релиза.
 - **2026-08-18** — файл заведён при аудите документации (модуль уже существовал).

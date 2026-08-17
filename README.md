@@ -74,12 +74,12 @@ Requirements: macOS, Google Chrome, and [Node.js 20 or newer](https://nodejs.org
    ```
    (Type `xattr -dr com.apple.quarantine ` in Terminal, then drag the unzipped folder into the window to fill in its path, and press Return.) Then double-click **Install on macOS.command**.
 4. Chrome opens `chrome://extensions`. Enable **Developer mode**.
-5. Click **Load unpacked** and select the `extension` folder inside the unzipped archive.
+5. Click **Load unpacked** and select `~/Library/Application Support/Shadcn Page Collector/extension` — the installer copies the extension there, so this path stays the same across updates and does not depend on where you unzipped or downloaded the archive.
 6. Open `chrome://extensions/shortcuts`, find **Shadcn Page Collector — Capture the active page**, and verify its shortcut. On macOS, click the pencil and press `Command+Shift+K` if the field is empty.
 7. On the first **Add current page** or **Add screenshot** click, accept Chrome's website-access request. Collector needs it to reach the tab from the side panel.
 8. Pin the extension if desired, then restart Codex or Claude Code once so it discovers the installed skill.
 
-The installer copies the Native Messaging host into `~/Library/Application Support/Shadcn Page Collector/` and installs the same public skill into `~/.codex/skills/shadcn-collector/` and `~/.claude/skills/shadcn-collector/`. The downloaded archive may be removed after Chrome has loaded the extension.
+The installer copies the Native Messaging host and the extension itself into `~/Library/Application Support/Shadcn Page Collector/` and installs the same public skill into `~/.codex/skills/shadcn-collector/` and `~/.claude/skills/shadcn-collector/`. The downloaded archive and its unzipped folder may be deleted right after step 5 — Chrome loads the extension from the permanent copy, not from the download.
 
 Chrome Web Store distribution is not included yet, so the one remaining browser step is **Load unpacked**.
 
@@ -92,7 +92,7 @@ cp .env.example .env
 npm run setup
 ```
 
-Then open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select `dist/extension`.
+Then open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select `dist/extension`. Unlike the release flow above, point Chrome at the repo's own `dist/extension` here: it changes on every `npm run build`, so a rebuild only needs **Reload** in `chrome://extensions` to take effect. `npm run install:host` (part of `npm run setup`) also copies the current build into the permanent `~/Library/Application Support/Shadcn Page Collector/extension`, but that copy only refreshes when you rerun it — not on every build.
 
 Open `chrome://extensions/shortcuts` and verify that **Capture the active page** is assigned to `Command+Shift+K` on macOS or `Alt+Shift+B` on other platforms.
 
@@ -100,7 +100,7 @@ The public SPKI key in `.env.example` only keeps the unpacked extension ID stabl
 
 ### Update or remove
 
-For an update, replace the release folder, run **Install on macOS.command** again, and click **Reload** on the extension card in `chrome://extensions`. Then check `chrome://extensions/shortcuts`: Chrome may leave a renamed or conflicting extension command unassigned instead of transferring the old shortcut.
+For an update, download and unzip the new release, run **Install on macOS.command** again, and click **Reload** on the extension card in `chrome://extensions` — the installer overwrites the same permanent copy, so **Load unpacked** does not need to be repeated. Then check `chrome://extensions/shortcuts`: Chrome may leave a renamed or conflicting extension command unassigned instead of transferring the old shortcut.
 
 ### Keyboard shortcut
 
@@ -124,7 +124,7 @@ The **Add current page** button below the page name always provides the same cap
 To remove Collector completely:
 
 1. Remove the extension from `chrome://extensions`.
-2. From the downloaded package or source checkout, run `node scripts/uninstall-host.mjs`.
+2. From the downloaded package or source checkout, run `node scripts/uninstall-host.mjs`. This also deletes the permanent copy at `~/Library/Application Support/Shadcn Page Collector/`.
 3. Finished `Collector/` folders are user data and are not deleted automatically.
 
 ## Usage
