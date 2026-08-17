@@ -11,6 +11,8 @@
 
 - Exported `page-spec.json` no longer keeps a stale `screenshotPath` when a block's screenshot data is missing at export time.
 - The context-menu capture error is now logged in English, matching the rest of the worker's log messages.
+- `scripts/package-release.mjs` referenced the renamed `docs/` folder and made `npm run package` fail with `ENOENT`.
+- The GitHub Release install steps described a Control-click bypass for `Install on macOS.command` that recent macOS no longer offers; the README now gives the working `xattr -dr com.apple.quarantine` Terminal command.
 
 ### Documentation
 
