@@ -68,7 +68,11 @@ Requirements: macOS, Google Chrome, and [Node.js 20 or newer](https://nodejs.org
 
 1. Download `Shadcn-Page-Collector-v0.10.0.zip` from the latest GitHub Release.
 2. Unzip the archive.
-3. Double-click **Install on macOS.command**. If macOS blocks it, Control-click the file, choose **Open**, and confirm once.
+3. macOS quarantines every downloaded file, so opening **Install on macOS.command** directly is blocked with "Apple could not verify..." and no **Open** option — recent macOS removed the Control-click bypass for scripts. Clear the quarantine flag once in Terminal before running it:
+   ```bash
+   xattr -dr com.apple.quarantine ~/Downloads/Shadcn-Page-Collector-v0.10.0
+   ```
+   (Type `xattr -dr com.apple.quarantine ` in Terminal, then drag the unzipped folder into the window to fill in its path, and press Return.) Then double-click **Install on macOS.command**.
 4. Chrome opens `chrome://extensions`. Enable **Developer mode**.
 5. Click **Load unpacked** and select the `extension` folder inside the unzipped archive.
 6. Open `chrome://extensions/shortcuts`, find **Shadcn Page Collector — Capture the active page**, and verify its shortcut. On macOS, click the pencil and press `Command+Shift+K` if the field is empty.
