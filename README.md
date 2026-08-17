@@ -92,7 +92,7 @@ cp .env.example .env
 npm run setup
 ```
 
-Then open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select `dist/extension`.
+Then open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select `dist/extension`. Unlike the release flow above, point Chrome at the repo's own `dist/extension` here: it changes on every `npm run build`, so a rebuild only needs **Reload** in `chrome://extensions` to take effect. `npm run install:host` (part of `npm run setup`) also copies the current build into the permanent `~/Library/Application Support/Shadcn Page Collector/extension`, but that copy only refreshes when you rerun it — not on every build.
 
 Open `chrome://extensions/shortcuts` and verify that **Capture the active page** is assigned to `Command+Shift+K` on macOS or `Alt+Shift+B` on other platforms.
 
