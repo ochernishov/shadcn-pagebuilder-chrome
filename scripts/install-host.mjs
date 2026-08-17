@@ -20,6 +20,11 @@ fs.copyFileSync(path.join(root, "native-host", "host.mjs"), installedHost);
 const launcher = path.join(runtimeDir, "native-host.sh");
 fs.writeFileSync(launcher, `#!/bin/sh\nexport PAGE_COLLECTOR_EXPORT_DIRECTORY=${JSON.stringify(env.EXPORT_DIRECTORY)}\nexport PAGE_COLLECTOR_PROJECT_EXPORT_DIRECTORY=${JSON.stringify(env.PROJECT_EXPORT_DIRECTORY)}\nexec ${JSON.stringify(process.execPath)} ${JSON.stringify(installedHost)}\n`, { mode: 0o700 });
 fs.writeFileSync(path.join(hostDir, `${env.NATIVE_HOST_NAME}.json`), JSON.stringify({ name: env.NATIVE_HOST_NAME, description: `${env.APP_NAME} local export host`, path: launcher, type: "stdio", allowed_origins: [`chrome-extension://${extensionId}/`] }, null, 2) + "\n");
+const builtExtensionSource = fs.existsSync(path.join(root, "extension", "manifest.json")) ? path.join(root, "extension") : path.join(root, "dist", "extension");
+if (!fs.existsSync(path.join(builtExtensionSource, "manifest.json"))) throw new Error("Built extension not found — run npm run build first");
+const installedExtension = path.join(runtimeDir, "extension");
+fs.rmSync(installedExtension, { recursive: true, force: true });
+fs.cpSync(builtExtensionSource, installedExtension, { recursive: true });
 const skillName = env.COLLECTOR_SKILL_NAME;
 const skillSource = path.join(root, "skills", skillName);
 if (!skillName || !fs.existsSync(path.join(skillSource, "SKILL.md"))) throw new Error("Collector skill source is missing");
@@ -30,4 +35,5 @@ for (const skillsDirectory of skillTargets) {
   fs.cpSync(skillSource, target, { recursive: true, force: true });
 }
 console.log(`Installed native host for ${extensionId}`);
+console.log(`Installed extension bundle at ${installedExtension}`);
 console.log(`Installed ${skillName} for Codex and Claude Code`);

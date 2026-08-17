@@ -9,6 +9,12 @@ if (!hostName) throw new Error("NATIVE_HOST_NAME is missing");
 const manifest = path.join(os.homedir(), "Library", "Application Support", "Google", "Chrome", "NativeMessagingHosts", `${hostName}.json`);
 fs.rmSync(manifest, { force: true });
 console.log(`Removed ${manifest}`);
+const appName = value("APP_NAME");
+if (appName) {
+  const runtimeDir = path.join(os.homedir(), "Library", "Application Support", appName);
+  fs.rmSync(runtimeDir, { recursive: true, force: true });
+  console.log(`Removed ${runtimeDir}`);
+}
 const skillName = value("COLLECTOR_SKILL_NAME");
 for (const directory of [value("CODEX_SKILLS_DIRECTORY"), value("CLAUDE_SKILLS_DIRECTORY")]) {
   if (!skillName || !directory) continue;

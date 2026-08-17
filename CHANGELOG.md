@@ -13,6 +13,7 @@
 - The context-menu capture error is now logged in English, matching the rest of the worker's log messages.
 - `scripts/package-release.mjs` referenced the renamed `docs/` folder and made `npm run package` fail with `ENOENT`.
 - The GitHub Release install steps described a Control-click bypass for `Install on macOS.command` that recent macOS no longer offers; the README now gives the working `xattr -dr com.apple.quarantine` Terminal command.
+- `Install on macOS.command` pointed **Load unpacked** at the extraction folder (typically `~/Downloads`); moving or deleting it broke the extension permanently. The installer now copies the built extension into `~/Library/Application Support/Shadcn Page Collector/extension`, a stable path that survives cleanup and future updates; `scripts/uninstall-host.mjs` removes it again.
 
 ### Documentation
 
