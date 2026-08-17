@@ -13,7 +13,7 @@ Collect blocks and visual references from any website, arrange a page outline, a
 
 The extension separates visual research from implementation. **Page** mode saves source pages, selected text, notes, and screenshots into an ordered page specification. Clicking **Finish page** creates a package such as `Collector/482731/` inside the chosen project. **One block** mode prepares a standalone reference that can be pasted directly into Codex, Claude Code, or another coding agent without changing the page collection.
 
-![Shadcn Page Collector with Page and One block workflows](docs/screenshots/01-workflow-modes.jpg)
+![Shadcn Page Collector with Page and One block workflows](docs-shadcn-pagebuilder-chrome/screenshots/01-workflow-modes.jpg)
 
 ```text
 Chrome reference collection
@@ -107,7 +107,7 @@ The shortcut and the toolbar icon intentionally perform different actions:
 
 Chrome does not guarantee that a suggested shortcut is assigned when another extension already uses it or when a command changes during an update. If capture does not run:
 
-![Chrome keyboard shortcut settings for Shadcn Page Collector](<docs/screenshots/05-chrome-shortcut-settings - 2.jpg>)
+![Chrome keyboard shortcut settings for Shadcn Page Collector](<docs-shadcn-pagebuilder-chrome/screenshots/05-chrome-shortcut-settings - 2.jpg>)
 
 1. Paste `chrome://extensions/shortcuts` into the Chrome address bar.
 2. Find **Shadcn Page Collector**.
@@ -133,15 +133,15 @@ Choose **Page** or **One block** directly below the application title. Switching
 
 The native macOS picker connects Collector to the real project directory where the numbered package will be written.
 
-![Choosing the project directory with the native macOS folder picker](docs/screenshots/03-project-folder-picker.jpg)
+![Choosing the project directory with the native macOS folder picker](docs-shadcn-pagebuilder-chrome/screenshots/03-project-folder-picker.jpg)
 
 2. Enter the page name, route, and **Create/Edit** intent.
 
-![Expanded project settings with folder, page route, and task](docs/screenshots/02-project-settings-expanded.jpg)
+![Expanded project settings with folder, page route, and task](docs-shadcn-pagebuilder-chrome/screenshots/02-project-settings-expanded.jpg)
 
 Project settings collapse after setup, keeping the page actions and collected outline in focus.
 
-![Collapsed project settings and page capture actions](docs/screenshots/04-project-settings-collapsed.jpg)
+![Collapsed project settings and page capture actions](docs-shadcn-pagebuilder-chrome/screenshots/04-project-settings-collapsed.jpg)
 
 3. Open a block, component, or reference page.
 4. Click **Add current page**, press `⇧⌘K`, or use **Add to Shadcn Page Collector** in the context menu. All three prepare the active page without toggling the panel; click the extension icon whenever you need to open the panel.
@@ -149,23 +149,23 @@ Project settings collapse after setup, keeping the page actions and collected ou
 
 Collector stores the source URL and your implementation intent. A visible screenshot can travel with the reference, but no hidden library source is extracted.
 
-![Capturing a source block from a component library](docs/screenshots/07-source-capture.jpg)
+![Capturing a source block from a component library](docs-shadcn-pagebuilder-chrome/screenshots/07-source-capture.jpg)
 
 6. For an arbitrary visual fragment, click **Add screenshot**, drag a rectangle on the page, and release.
 
 The same workflow works on ordinary websites and galleries: select only the region the coding agent should treat as a visual reference.
 
-![Selecting an arbitrary page region as a screenshot reference](docs/screenshots/08-region-screenshot-selection.jpg)
+![Selecting an arbitrary page region as a screenshot reference](docs-shadcn-pagebuilder-chrome/screenshots/08-region-screenshot-selection.jpg)
 
 7. Expand items to inspect their source, edit and save implementation notes, review install metadata and screenshots, and reorder or remove items as needed. `Command+Enter` on macOS or `Ctrl+Enter` elsewhere also saves the notes field.
 
 The outline may mix source blocks and screenshot-only references. Notes remain editable until the page is finished.
 
-![Ordered page outline with editable implementation notes](docs/screenshots/09-page-outline-editing.jpg)
+![Ordered page outline with editable implementation notes](docs-shadcn-pagebuilder-chrome/screenshots/09-page-outline-editing.jpg)
 
 8. Click **Finish page**. Collector first writes the numbered package, then clears the finished page, its draft, and its page screenshots. The successful export card remains visible so you can copy the six-digit Collector number.
 
-![Finished Collector package with its six-digit number and local path](docs/screenshots/11-finish-page.jpg)
+![Finished Collector package with its six-digit number and local path](docs-shadcn-pagebuilder-chrome/screenshots/11-finish-page.jpg)
 
 9. Open the same project in Codex or Claude Code and invoke the skill with that number.
 
@@ -178,7 +178,7 @@ The outline may mix source blocks and screenshot-only references. Notes remain e
 5. Click **Prepare block**, review the source and preview, then click **Copy for agent**.
 6. Paste into Codex, Claude Code, or another coding agent. The clipboard always contains structured JSON and, where supported, the captured PNG as an additional clipboard representation.
 
-![Preparing one standalone block without changing the page collection](docs/screenshots/10-single-block-mode.jpg)
+![Preparing one standalone block without changing the page collection](docs-shadcn-pagebuilder-chrome/screenshots/10-single-block-mode.jpg)
 
 ## Exported package
 
@@ -224,7 +224,7 @@ The canonical public skill is included at [`skills/shadcn-collector/`](skills/sh
 
 The agent resolves the exact six-digit package, reads its Markdown, JSON, and reference images, and then implements the result under the target project's own instructions.
 
-![A coding agent resolving a numbered Collector package](docs/screenshots/12-agent-skill.jpg)
+![A coding agent resolving a numbered Collector package](docs-shadcn-pagebuilder-chrome/screenshots/12-agent-skill.jpg)
 
 ## Languages
 
@@ -240,7 +240,7 @@ English is the default. The bottom switcher supports:
 
 The selected locale controls every system label, status message, semantic section name, context-menu title, and exported Markdown instruction. Built-in placeholder names such as **Landing Page** also follow the locale. Names entered by the user and real folder names are intentionally preserved exactly as written.
 
-![English, Russian, French, Italian, and Chinese interfaces](docs/screenshots/13-languages.jpg)
+![English, Russian, French, Italian, and Chinese interfaces](docs-shadcn-pagebuilder-chrome/screenshots/13-languages.jpg)
 
 ## What is public and what stays local
 
@@ -282,7 +282,7 @@ npm run package
 
 Source files live in `extension/`; `dist/extension/` and `release/` are generated and ignored. After rebuilding, click **Reload** for the unpacked extension on `chrome://extensions`.
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md) for implementation and contribution details.
+See [`docs-shadcn-pagebuilder-chrome/architecture.md`](docs-shadcn-pagebuilder-chrome/architecture.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md) for implementation and contribution details.
 
 ## License
 

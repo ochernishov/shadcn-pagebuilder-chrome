@@ -1,5 +1,8 @@
 # Shadcn Page Collector architecture
 
+Local-first, no backend: a Chrome MV3 extension plus a local Native Messaging
+host, chosen over a cloud service ([ADR-0001](adr/0001-mv3-extension-native-host-local-first.md)).
+
 ## Data flow
 
 ```text
