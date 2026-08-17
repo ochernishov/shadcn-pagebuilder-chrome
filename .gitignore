@@ -9,3 +9,7 @@ node_modules/
 release/
 Collector/
 .page-collector/
+
+# git worktree задач: основное дерево держит только main
+.worktrees/
+.claude/worktrees/
