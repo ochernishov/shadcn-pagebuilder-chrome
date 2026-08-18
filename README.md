@@ -66,11 +66,11 @@ No library API key is required by Collector. Credentials remain in the user's au
 
 Requirements: macOS, Google Chrome, and [Node.js 20 or newer](https://nodejs.org/).
 
-1. Download `Shadcn-Page-Collector-v0.10.0.zip` from the latest GitHub Release.
+1. Download `Shadcn-Page-Collector-v0.10.1.zip` from the latest GitHub Release.
 2. Unzip the archive.
 3. macOS quarantines every downloaded file, so opening **Install on macOS.command** directly is blocked with "Apple could not verify..." and no **Open** option — recent macOS removed the Control-click bypass for scripts. Clear the quarantine flag once in Terminal before running it:
    ```bash
-   xattr -dr com.apple.quarantine ~/Downloads/Shadcn-Page-Collector-v0.10.0
+   xattr -dr com.apple.quarantine ~/Downloads/Shadcn-Page-Collector-v0.10.1
    ```
    (Type `xattr -dr com.apple.quarantine ` in Terminal, then drag the unzipped folder into the window to fill in its path, and press Return.) Then double-click **Install on macOS.command**.
 4. Chrome opens `chrome://extensions`. Enable **Developer mode**.
