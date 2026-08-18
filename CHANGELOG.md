@@ -5,6 +5,12 @@
 ### Fixed
 - **Claude Code не видел правил проекта**: инструкции лежали только в `AGENTS.md`, а он читает `CLAUDE.md`. Добавлен симлинк — не копия, копия расходится молча.
 
+## [Unreleased]
+
+### Fixed
+
+- The GitHub Release install steps sent users to `~/Library/Application Support/...` in the folder picker Chrome opens for **Load unpacked**, but `~/Library` is hidden there by default and the sidebar's "Library" shortcut opens the system one instead. The README now points to **Command+Shift+G** (Go to Folder) to jump straight to the path.
+
 ## [0.10.1] — 2026-08-18
 
 ### Fixed

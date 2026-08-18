@@ -74,7 +74,7 @@ Requirements: macOS, Google Chrome, and [Node.js 20 or newer](https://nodejs.org
    ```
    (Type `xattr -dr com.apple.quarantine ` in Terminal, then drag the unzipped folder into the window to fill in its path, and press Return.) Then double-click **Install on macOS.command**.
 4. Chrome opens `chrome://extensions`. Enable **Developer mode**.
-5. Click **Load unpacked** and select `~/Library/Application Support/Shadcn Page Collector/extension` — the installer copies the extension there, so this path stays the same across updates and does not depend on where you unzipped or downloaded the archive.
+5. Click **Load unpacked**. The folder picker this opens hides `~/Library` by default and its sidebar shortcut to "Library" opens the system one instead — press **Command+Shift+G**, paste `~/Library/Application Support/Shadcn Page Collector/extension`, and press Return to jump straight there. The installer copies the extension there, so this path stays the same across updates and does not depend on where you unzipped or downloaded the archive.
 6. Open `chrome://extensions/shortcuts`, find **Shadcn Page Collector — Capture the active page**, and verify its shortcut. On macOS, click the pencil and press `Command+Shift+K` if the field is empty.
 7. On the first **Add current page** or **Add screenshot** click, accept Chrome's website-access request. Collector needs it to reach the tab from the side panel.
 8. Pin the extension if desired, then restart Codex or Claude Code once so it discovers the installed skill.
