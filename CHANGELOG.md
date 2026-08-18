@@ -9,7 +9,7 @@
 
 ### Fixed
 
-- The GitHub Release install steps sent users to `~/Library/Application Support/...` in Finder's **Load unpacked** picker, but `~/Library` is hidden there by default and the sidebar's "Library" shortcut opens the system one instead. The README now points to **Command+Shift+G** (Go to Folder) to jump straight to the path in any standard macOS open dialog.
+- The GitHub Release install steps sent users to `~/Library/Application Support/...` in the folder picker Chrome opens for **Load unpacked**, but `~/Library` is hidden there by default and the sidebar's "Library" shortcut opens the system one instead. The README now points to **Command+Shift+G** (Go to Folder) to jump straight to the path.
 
 ## [0.10.1] — 2026-08-18
 
