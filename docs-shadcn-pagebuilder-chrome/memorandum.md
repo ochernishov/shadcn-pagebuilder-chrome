@@ -18,7 +18,7 @@ Claude Code) как локальный пронумерованный пакет
 
 ## Заказчик
 
-Проект COS (Олег Чернышов), публичный open-source репозиторий
+Проект Cosinn (Олег Чернышов), публичный open-source репозиторий
 (`github.com/ochernishov/shadcn-pagebuilder-chrome`, лицензия MIT).
 
 ## Архитектура
