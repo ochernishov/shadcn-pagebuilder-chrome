@@ -19,16 +19,60 @@ permissions:
   contents: read
 
 jobs:
+  # Дифф из одной документации (md/mdx/картинки/docs-*) не должен гонять
+  # сборку и тесты. required-check ruleset завязан на имя job'а `verify`,
+  # поэтому сам job не пропускается — пропускаются только его тяжёлые шаги.
+  changes:
+    runs-on: [self-hosted, cosinn]
+    outputs:
+      docs_only: ${{ steps.diff.outputs.docs_only }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: diff
+        shell: bash
+        run: |
+          # База: для PR — целевая ветка, для push — предыдущий коммит (или родитель мержа).
+          if [ -n "${{ github.base_ref }}" ]; then
+            base="origin/${{ github.base_ref }}"
+            git fetch -q origin "${{ github.base_ref }}" --depth=1 2>/dev/null || true
+            range="$(git merge-base "$base" HEAD)..HEAD"
+          else
+            range="${{ github.event.before }}..${{ github.sha }}"
+            git rev-parse -q --verify "${{ github.event.before }}" >/dev/null 2>&1 || range="HEAD~1..HEAD"
+          fi
+          files=$(git diff --name-only $range)
+          echo "$files"
+          docs_only=false
+          if [ -n "$files" ] && ! echo "$files" | grep -Eqv '(\.(md|mdx|excalidraw|drawio|svg|png|jpe?g|gif|webp|pdf)$)|(^|/)docs(-[^/]*)?/'; then
+            docs_only=true
+          fi
+          echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
+
   verify:
+    needs: [changes]
     runs-on: [self-hosted, cosinn]
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - if: needs.changes.outputs.docs_only != 'true'
+        uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Prepare environment
+        if: needs.changes.outputs.docs_only != 'true'
         run: cp .env.example .env
       - name: Build extension
+        if: needs.changes.outputs.docs_only != 'true'
         run: npm run build
       - name: Run tests
+        if: needs.changes.outputs.docs_only != 'true'
         run: npm run check
+
+  docs:
+    needs: [changes]
+    if: needs.changes.outputs.docs_only == 'true'
+    runs-on: [self-hosted, cosinn]
+    steps:
+      - uses: actions/checkout@v7
+      - run: 'echo "docs-only, проверок кода не требуется"'
